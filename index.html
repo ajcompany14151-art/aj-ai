@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AJ - AI Assistant by AJ STUDIOZ</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzNEODJGRiIgLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOUI0NkZGIiAvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjx0ZXh0IHg9IjE2IiB5PSIyMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPkFKPC90ZXh0Pgo8L3N2Zz4K" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -122,8 +121,9 @@
         .active .text-muted-foreground { color: rgb(var(--primary-foreground)/0.8); }
         .suggestion-chip { transition: all 0.3s ease; cursor: pointer; }
         .suggestion-chip:hover { transform: translateY(-2px) scale(1.05); }
-        .floating-btn { position: fixed; top: 1rem; right: 1rem; z-index: 30; transition: all 0.3s ease; }
-        .floating-btn:hover { transform: scale(1.1) rotate(8deg); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4), 0 4px 12px rgba(139, 92, 246, 0.3); }
+        .model-radio { transition: all 0.3s ease; cursor: pointer; }
+        .model-option-btn { transition: all 0.3s ease; cursor: pointer; }
+        .model-option-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
 <body class="font-sans">
@@ -283,80 +283,100 @@
             </div>
         </div>
     </div>
-    <div class="floating-btn">
-        <button id="modelBtn" class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-white/20 backdrop-blur-sm">
-            <span class="text-lg font-bold">AJ</span>
-        </button>
-    </div>
-    <div id="modelModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-        <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:0.75rem;box-shadow:0 10px 25px rgba(0, 0, 0, 0.1);max-width:28rem;width:90%;margin:0 auto;">
-            <div class="p-6 border-b border-border flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Select AI Model</h3>
-                <button id="closeModelBtn" class="p-2 hover:bg-accent rounded-lg transition-colors">
-                    <i data-lucide="x" class="h-4 w-4"></i>
-                </button>
-            </div>
-            <div class="p-6 space-y-4">
-                <button class="model-option w-full p-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-4 text-left border border-border" data-model="grok">
-                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">AJ</div>
-                    <div>
-                        <div class="font-medium">AJ-Fast</div>
-                        <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
-                    </div>
-                </button>
-                <button class="model-option w-full p-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-4 text-left border border-border" data-model="gemini">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">AJ</div>
-                    <div>
-                        <div class="font-medium">AJ-Creative</div>
-                        <div class="text-sm text-muted-foreground">Enhanced creativity and reasoning</div>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
     <div id="settingsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-        <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:0.75rem;box-shadow:0 10px 25px rgba(0, 0, 0, 0.1);max-width:28rem;width:90%;margin:0 auto;">
+        <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:1rem;box-shadow:0 20px 50px rgba(0, 0, 0, 0.2);max-width:32rem;width:90%;margin:0 auto;">
             <div class="p-6 border-b border-border flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Settings</h3>
+                <div>
+                    <h3 class="text-xl font-semibold">Settings</h3>
+                    <p class="text-sm text-muted-foreground">Customize your AI Assistant experience</p>
+                </div>
                 <button id="closeSettingsBtn" class="p-2 hover:bg-accent rounded-lg transition-colors">
-                    <i data-lucide="x" class="h-4 w-4"></i>
+                    <i data-lucide="x" class="h-5 w-5"></i>
                 </button>
             </div>
-            <div class="p-6 space-y-6">
-                <div class="flex items-center justify-between">
-                    <label for="darkModeToggle" class="font-medium">Dark Mode</label>
-                    <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                        <input type="checkbox" id="darkModeToggle">
-                        <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                    </label>
-                </div>
-                <div class="flex items-center justify-between">
-                    <label for="typingToggle" class="font-medium">Typing Animation</label>
-                    <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                        <input type="checkbox" id="typingToggle" checked>
-                        <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                    </label>
-                </div>
-                <div class="space-y-3">
-                    <label class="font-medium">Font Size</label>
-                    <div class="flex gap-2">
-                        <button class="fontSizeBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-size="small">Small</button>
-                        <button class="fontSizeBtn w-full py-2" data-size="medium">Medium</button>
-                        <button class="fontSizeBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-size="large">Large</button>
+            <div class="p-6 space-y-8 max-h-96 overflow-y-auto">
+                <!-- AI Model Selection -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-lg">AI Model</h4>
+                            <p class="text-sm text-muted-foreground">Choose your preferred AI assistant</p>
+                        </div>
+                        <div class="text-sm text-muted-foreground">
+                            Current: <span id="currentModelDisplay" class="font-medium text-primary">AJ-Fast</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3">
+                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="grok">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                            <div class="flex-1">
+                                <div class="font-medium">AJ-Fast</div>
+                                <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="grok"></div>
+                        </button>
+                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="gemini">
+                            <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                            <div class="flex-1">
+                                <div class="font-medium">AJ-Creative</div>
+                                <div class="text-sm text-muted-foreground">Enhanced creativity and reasoning</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="gemini"></div>
+                        </button>
                     </div>
                 </div>
-                <div class="space-y-3">
-                    <label class="font-medium">Typing Speed</label>
-                    <div class="flex gap-2">
-                        <button class="typingSpeedBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-speed="slow">Slow</button>
-                        <button class="typingSpeedBtn w-full py-2" data-speed="medium">Medium</button>
-                        <button class="typingSpeedBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-speed="fast">Fast</button>
+
+                <div class="border-t border-border pt-6"></div>
+
+                <!-- Appearance Settings -->
+                <div class="space-y-6">
+                    <h4 class="font-medium text-lg">Appearance</h4>
+                    
+                    <div class="flex items-center justify-between">
+                        <label for="darkModeToggle" class="font-medium">Dark Mode</label>
+                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <label for="typingToggle" class="font-medium">Typing Animation</label>
+                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                            <input type="checkbox" id="typingToggle" checked>
+                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="border-t border-border pt-6"></div>
+
+                <!-- Text Settings -->
+                <div class="space-y-6">
+                    <h4 class="font-medium text-lg">Text Settings</h4>
+                    
+                    <div class="space-y-3">
+                        <label class="font-medium">Font Size</label>
+                        <div class="flex gap-2">
+                            <button class="fontSizeBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-size="small">Small</button>
+                            <button class="fontSizeBtn w-full py-2.5" data-size="medium">Medium</button>
+                            <button class="fontSizeBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-size="large">Large</button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <label class="font-medium">Typing Speed</label>
+                        <div class="flex gap-2">
+                            <button class="typingSpeedBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-speed="slow">Slow</button>
+                            <button class="typingSpeedBtn w-full py-2.5" data-speed="medium">Medium</button>
+                            <button class="typingSpeedBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-speed="fast">Fast</button>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="p-6 border-t border-border flex gap-3">
-                <button id="resetSettingsBtn" class="w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80">Reset</button>
-                <button id="saveSettingsBtn" class="w-full py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">Save</button>
+                <button id="resetSettingsBtn" class="w-full py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors font-medium">Reset</button>
+                <button id="saveSettingsBtn" class="w-full py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">Save Changes</button>
             </div>
         </div>
     </div>
@@ -371,7 +391,7 @@
             grok: { name: 'AJ-Fast', apiModel: 'llama3-8b-8192', color: 'from-blue-500 to-purple-600', icon: 'AJ', endpoint: '/api/chat' },
             gemini: { name: 'AJ-Creative', apiModel: 'gemini-1.5-flash', color: 'from-purple-500 to-pink-600', icon: 'AJ', endpoint: '/api/chat' }
         };
-        const D = { html: document.documentElement, chatContainer: document.getElementById('chatContainer'), welcomeScreen: document.getElementById('welcomeScreen'), messagesContainer: document.getElementById('messagesContainer'), messageInput: document.getElementById('messageInput'), sendBtn: document.getElementById('sendBtn'), chatList: document.getElementById('chatList'), modelModal: document.getElementById('modelModal'), settingsModal: document.getElementById('settingsModal'), sidebar: document.getElementById('sidebar'), sidebarOverlay: document.getElementById('sidebarOverlay') };
+        const D = { html: document.documentElement, chatContainer: document.getElementById('chatContainer'), welcomeScreen: document.getElementById('welcomeScreen'), messagesContainer: document.getElementById('messagesContainer'), messageInput: document.getElementById('messageInput'), sendBtn: document.getElementById('sendBtn'), chatList: document.getElementById('chatList'), settingsModal: document.getElementById('settingsModal'), sidebar: document.getElementById('sidebar'), sidebarOverlay: document.getElementById('sidebarOverlay') };
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             loadState();
@@ -386,8 +406,6 @@
             document.getElementById('exportBtn').addEventListener('click', () => showToast('Export feature coming soon!', 'info'));
             document.getElementById('attachBtn').addEventListener('click', () => showToast('File attachments coming soon!', 'info'));
             document.getElementById('voiceBtn').addEventListener('click', () => showToast('Voice input coming soon!', 'info'));
-            document.getElementById('modelBtn').addEventListener('click', () => D.modelModal.classList.remove('hidden'));
-            document.getElementById('closeModelBtn').addEventListener('click', () => D.modelModal.classList.add('hidden'));
             document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
             document.getElementById('closeSettingsBtn').addEventListener('click', () => D.settingsModal.classList.add('hidden'));
             document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
@@ -399,9 +417,16 @@
             D.sendBtn.addEventListener('click', sendMessage);
             document.getElementById('searchInput').addEventListener('input', (e) => renderChatList(e.target.value.toLowerCase()));
             document.querySelectorAll('.example-prompt').forEach(el => el.addEventListener('click', (e) => { D.messageInput.value = e.currentTarget.dataset.prompt; sendMessage(); }));
-            document.querySelectorAll('.model-option').forEach(el => el.addEventListener('click', (e) => selectModel(e.currentTarget.dataset.model)));
             document.querySelectorAll('.fontSizeBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.fontSizeBtn')));
             document.querySelectorAll('.typingSpeedBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.typingSpeedBtn')));
+            
+            // Add model selection listeners
+            document.querySelectorAll('.model-option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const model = e.currentTarget.dataset.model;
+                    selectModelInSettings(model);
+                });
+            });
         }
         async function sendMessage() {
             const messageText = D.messageInput.value.trim();
@@ -568,20 +593,65 @@
             chat.messages.splice(index-1); 
             await sendMessage(); 
         }
-        function selectModel(model) { 
-            state.currentModel = model; 
-            const chat = state.chats.find(c => c.id === state.selectedChatId); 
-            if (chat) chat.model = model; 
-            D.modelModal.classList.add('hidden'); 
-            saveState(); 
-            showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info'); 
-        }
         function openSettingsModal() { 
             document.getElementById('darkModeToggle').checked = state.settings.darkMode; 
             document.getElementById('typingToggle').checked = state.settings.typingAnimation; 
             setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn'); 
-            setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn'); 
+            setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn');
+            
+            // Update model selection UI
+            updateModelSelectionUI();
+            
             D.settingsModal.classList.remove('hidden'); 
+        }
+        
+        function updateModelSelectionUI() {
+            // Update current model display
+            const currentModelDisplay = document.getElementById('currentModelDisplay');
+            if (currentModelDisplay) {
+                currentModelDisplay.textContent = MODEL_CONFIGS[state.currentModel].name;
+            }
+            
+            // Update radio buttons
+            document.querySelectorAll('.model-radio').forEach(radio => {
+                const model = radio.dataset.model;
+                if (model === state.currentModel) {
+                    radio.style.backgroundColor = 'rgb(var(--primary))';
+                    radio.style.borderColor = 'rgb(var(--primary))';
+                    radio.innerHTML = '<div style="width: 100%; height: 100%; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center;"><div style="width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--primary));"></div></div>';
+                } else {
+                    radio.style.backgroundColor = 'transparent';
+                    radio.style.borderColor = 'rgb(var(--muted-foreground), 0.3)';
+                    radio.innerHTML = '';
+                }
+            });
+            
+            // Update button borders
+            document.querySelectorAll('.model-option-btn').forEach(btn => {
+                const model = btn.dataset.model;
+                if (model === state.currentModel) {
+                    btn.style.borderColor = 'rgb(var(--primary))';
+                    btn.style.backgroundColor = 'rgba(var(--primary), 0.1)';
+                } else {
+                    btn.style.borderColor = 'transparent';
+                    btn.style.backgroundColor = 'transparent';
+                }
+            });
+        }
+        
+        function selectModelInSettings(model) {
+            state.currentModel = model;
+            updateModelSelectionUI();
+            
+            // Update current chat model if exists
+            if (state.selectedChatId) {
+                const chat = state.chats.find(c => c.id === state.selectedChatId);
+                if (chat) {
+                    chat.model = model;
+                }
+            }
+            
+            showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info');
         }
         function saveSettings() { 
             state.settings.darkMode = document.getElementById('darkModeToggle').checked; 
