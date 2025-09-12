@@ -1,4 +1,4 @@
-/**
+**
  * Vercel Serverless Function to proxy requests to Grok & Gemini APIs.
  * Place this file in the /api directory.
  */
@@ -7,17 +7,20 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+  
   try {
     // 2. Get input from frontend
     const { ai, messages } = req.body;
     if (!ai) {
       return res.status(400).json({ error: "Missing 'ai' field (grok or gemini)" });
     }
+    
     // Support both history[] and messages[]
     const chatHistory = messages;
     if (!chatHistory || !Array.isArray(chatHistory)) {
       return res.status(400).json({ error: "Invalid chat history provided" });
     }
+    
     let url = "";
     let headers = { "Content-Type": "application/json" };
     let body = {};
@@ -28,8 +31,10 @@ export default async function handler(req, res) {
       if (!GROQ_API_KEY) {
         return res.status(500).json({ error: "GROQ_API_KEY not set" });
       }
+      
       url = "https://api.groq.com/openai/v1/chat/completions";
       headers.Authorization = `Bearer ${GROQ_API_KEY}`;
+      
       body = {
         model: "llama-3.3-70b-versatile", // default Grok model
         messages: chatHistory.map(m => ({
@@ -44,7 +49,9 @@ export default async function handler(req, res) {
       if (!GEMINI_API_KEY) {
         return res.status(500).json({ error: "GEMINI_API_KEY not set" });
       }
+      
       url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+      
       let systemInstruction = null;
       const contents = chatHistory
         .map(turn => {
@@ -58,6 +65,7 @@ export default async function handler(req, res) {
           };
         })
         .filter(Boolean);
+      
       body = {
         contents,
         ...(systemInstruction && { systemInstruction }),
@@ -87,7 +95,7 @@ export default async function handler(req, res) {
           role: msg.role === 'assistant' ? 'assistant' : 'user',
           content: msg.content || msg.text
         }));
-
+        
         // Add system message if not present
         if (!formattedMessages.some(msg => msg.role === 'system')) {
           formattedMessages.unshift({
@@ -95,15 +103,16 @@ export default async function handler(req, res) {
             content: 'You are a helpful AI assistant. Provide clear, concise, and accurate responses.'
           });
         }
-
+        
         const completion = await zai.chat.completions.create({
           messages: formattedMessages,
           temperature: 0.7,
           max_tokens: 1024,
         });
-
+        
         const botResponse = completion.choices[0]?.message?.content || "No response";
         return res.status(200).json({ response: botResponse });
+        
       } catch (zaiError) {
         console.error('Z-AI SDK Error:', zaiError);
         return res.status(500).json({
@@ -119,6 +128,7 @@ export default async function handler(req, res) {
       headers,
       body: JSON.stringify(body)
     });
+    
     if (!response.ok) {
       const errorText = await response.text();
       console.error("API Error:", errorText);
@@ -127,20 +137,24 @@ export default async function handler(req, res) {
         details: errorText
       });
     }
+    
     const data = await response.json();
+    
     // 7. Extract AI response
     let botResponse = "No response";
+    
     if (ai === "grok") {
       botResponse = data.choices?.[0]?.message?.content || "No response";
     } else if (ai === "gemini") {
       if (data.candidates?.[0]?.content?.parts) {
         botResponse = data.candidates[0].content.parts.map(p => p.text).join("\n");
       } else {
-        botResponse =
-          `I am unable to provide a response. Reason: ${data.promptFeedback?.blockReason || "Unknown"}`;
+        botResponse = `I am unable to provide a response. Reason: ${data.promptFeedback?.blockReason || "Unknown"}`;
       }
     }
+    
     return res.status(200).json({ response: botResponse });
+    
   } catch (err) {
     console.error("Server error:", err);
     return res.status(500).json({
