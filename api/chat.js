@@ -1,4 +1,4 @@
-/**
+**
  * Vercel Serverless Function to proxy requests to Grok & Gemini APIs.
  * Place this file in the /api directory.
  */
@@ -83,49 +83,7 @@ export default async function handler(req, res) {
         }
       };
     }
-    // 5. Use Z-AI SDK as primary or specific request
-    else if (ai === "zai") {
-      try {
-        // Import the Z-AI SDK dynamically
-        const ZAI = await import('z-ai-web-dev-sdk');
-        const zai = await ZAI.create();
-        
-        // Convert messages to the format expected by ZAI
-        const formattedMessages = chatHistory.map((msg) => ({
-          role: msg.role === 'assistant' ? 'assistant' : 'user',
-          content: msg.content || msg.text
-        }));
-        
-        // Add system message if not present
-        if (!formattedMessages.some(msg => msg.role === 'system')) {
-          formattedMessages.unshift({
-            role: 'system',
-            content: 'You are AJ, an advanced AI assistant created by AJ STUDIOZ. You are helpful, creative, and knowledgeable. Provide clear, concise, and accurate responses to user questions and requests. You have access to real-time information and can help with a wide range of tasks including coding, writing, analysis, research, and creative projects.'
-          });
-        }
-        
-        const completion = await zai.chat.completions.create({
-          messages: formattedMessages,
-          temperature: 0.7,
-          max_tokens: 2048,
-        });
-        
-        const botResponse = completion.choices[0]?.message?.content || "I apologize, but I'm unable to generate a response at the moment.";
-        return res.status(200).json({ 
-          response: botResponse,
-          model: "AJ-ZAI (Z-AI SDK)",
-          timestamp: new Date().toISOString()
-        });
-        
-      } catch (zaiError) {
-        console.error('Z-AI SDK Error:', zaiError);
-        return res.status(500).json({
-          error: "Z-AI SDK service error",
-          details: zaiError.message || "Z-AI SDK failed to process the request"
-        });
-      }
-    }
-    // 6. Use Z-AI SDK as fallback for other models
+    // 5. Use Z-AI SDK as fallback
     else {
       try {
         // Import the Z-AI SDK dynamically
