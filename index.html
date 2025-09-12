@@ -5,126 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AJ - AI Assistant by AJ STUDIOZ</title>
     <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzNEODJGRiIgLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOUI0NkZGIiAvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjx0ZXh0IHg9IjE2IiB5PSIyMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPkFKPC90ZXh0Pgo8L3N2Zz4K" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root{--background: 255, 255, 255;--foreground: 15, 23, 42;--card: 255, 255, 255;--card-foreground: 15, 23, 42;--popover: 255, 255, 255;--popover-foreground: 15, 23, 42;--primary: 59, 130, 246;--primary-foreground: 255, 255, 255;--secondary: 241, 245, 249;--secondary-foreground: 15, 23, 42;--muted: 248, 250, 252;--muted-foreground: 100, 116, 139;--accent: 241, 245, 249;--accent-foreground: 15, 23, 42;--destructive: 239, 68, 68;--destructive-foreground: 255, 255, 255;--border: 226, 232, 240;--input: 255, 255, 255;--ring: 59, 130, 246;--radius: 0.5rem;--sidebar-width: 260px; --font-size-base: 0.95rem; --font-size-sm: 0.875rem; --font-size-lg: 1.05rem;}
-        .dark{--background: 8, 8, 16;--foreground: 248, 250, 252;--card: 15, 23, 42;--card-foreground: 248, 250, 252;--popover: 15, 23, 42;--popover-foreground: 248, 250, 252;--primary: 99, 102, 241;--primary-foreground: 15, 23, 42;--secondary: 30, 41, 59;--secondary-foreground: 248, 250, 252;--muted: 30, 41, 59;--muted-foreground: 148, 163, 184;--accent: 51, 65, 85;--accent-foreground: 248, 250, 252;--destructive: 239, 68, 68;--destructive-foreground: 248, 250, 252;--border: 51, 65, 85;--input: 30, 41, 59;--ring: 99, 102, 241;}
-        *{border-color:hsl(var(--border));}
-        html { font-size: var(--font-size-base); }
-        body{background-color:rgb(var(--background));color:rgb(var(--foreground));font-family:'Inter', sans-serif;line-height:1.5;margin:0;padding:0;height:100vh;overflow:hidden;position:fixed;width:100%;}
-        #app{display:flex;flex-direction:column;height:100vh;overflow:hidden;width:100%;}
-        .main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100%;}
-        .chat-container{flex:1;overflow-y:auto;padding:1rem;padding-bottom:150px;scroll-behavior:smooth;}
-        .sidebar{background-color:rgb(var(--card));border-right:1px solid hsl(var(--border));width:var(--sidebar-width);flex-shrink:0;display:flex;flex-direction:column;}
-        .chat-item{padding:0.75rem;border-radius:0.5rem;cursor:pointer;margin-bottom:0.25rem;transition:all 0.2s ease;display:flex;align-items:center;gap:0.75rem;}
-        .chat-item:hover{background-color:rgb(var(--accent));}
-        .chat-item.active{background-color:rgb(var(--primary)); color: rgb(var(--primary-foreground));}
-        .chat-item.active .text-muted-foreground { color: rgb(var(--primary-foreground)/0.8); }
-        .message-bubble{border-radius:1rem;padding:1rem 1.25rem;max-width:85%;word-wrap:break-word;position:relative;transition: all 0.3s ease;backdrop-filter: blur(10px);animation: messageSlideIn 0.4s ease-out;}
-        @keyframes messageSlideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .user-message{background:linear-gradient(135deg, rgb(var(--primary)) 0%, rgba(var(--primary), 0.9) 100%);color:rgb(var(--primary-foreground));border-bottom-right-radius:0.5rem;margin-left:auto;box-shadow: 0 4px 12px rgba(var(--primary), 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);border:1px solid rgba(var(--primary), 0.2);}
-        .ai-message{background:linear-gradient(135deg, rgb(var(--muted)) 0%, rgba(var(--muted), 0.8) 100%);color:rgb(var(--foreground));border-bottom-left-radius:0.5rem;line-height:1.6;position: relative;border:1px solid hsl(var(--border));box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);backdrop-filter: blur(10px);}
-        .ai-message p, .ai-message ul, .ai-message ol { margin-bottom: 1rem; }
-        .ai-message ul, .ai-message ol { padding-left: 1.5rem; }
-        .input-area{border-top:1px solid hsl(var(--border));padding:1.5rem;background:linear-gradient(to bottom, transparent, rgb(var(--background)));flex-shrink:0;position:fixed;bottom:0;left:0;right:0;z-index:10;width:100%;backdrop-filter: blur(20px);}
-        .input-wrapper{max-width:48rem;margin:0 auto;position:relative;}
-        .input-area textarea{border:2px solid hsl(var(--border));border-radius:1rem;padding:1rem 1.25rem;padding-right:8rem;resize:none;background:rgba(var(--input), 0.8);color:rgb(var(--foreground));transition:all 0.3s ease;font-family:'Inter', sans-serif;max-height:200px;width:100%;backdrop-filter: blur(10px);box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);}
-        .input-area textarea:focus{border-color:rgb(var(--primary));outline:none;box-shadow:0 0 0 3px rgba(var(--primary), 0.2), 0 8px 25px rgba(var(--primary), 0.15);}
-        .input-actions{position:absolute;right:1rem;top:50%;transform: translateY(-50%);display:flex;align-items:center;gap:0.5rem;}
-        .send-btn{width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgb(var(--primary)) 0%, rgba(var(--primary), 0.8) 100%);color:rgb(var(--primary-foreground));border:none;cursor:pointer;transition:all 0.3s ease;box-shadow: 0 4px 12px rgba(var(--primary), 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);}
-        .send-btn:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(var(--primary), 0.5), 0 4px 8px rgba(0, 0, 0, 0.15);}
-        .send-btn:disabled{opacity:0.5;cursor:not-allowed;}
-        .code-block{background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);border-radius:0.75rem;overflow:hidden;margin:1rem 0;position:relative;border:1px solid rgba(148, 163, 184, 0.2);box-shadow:0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);backdrop-filter: blur(10px);}
-        .code-header{background:linear-gradient(135deg, #334155 0%, #1e293b 100%);padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;font-family:'Roboto Mono', monospace;font-weight:500;color:#e2e8f0;border-bottom:1px solid rgba(148, 163, 184, 0.2);}
-        .code-header button{background:linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);border:1px solid rgba(99, 102, 241, 0.3);border-radius:0.5rem;padding:0.25rem 0.75rem;color:#e2e8f0;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;gap:0.25rem;transition:all 0.3s ease;font-family:'Roboto Mono', monospace;font-weight:500;}
-        .code-header button:hover{background:linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);border-color:rgba(99, 102, 241, 0.5);color:white;transform:translateY(-1px);box-shadow:0 4px 12px rgba(99, 102, 241, 0.3);}
-        .code-content{padding:1rem;overflow-x-auto;background:rgba(15, 23, 42, 0.5);}
-        .code-content pre{margin:0;font-family:'Roboto Mono', monospace;font-size:0.875rem;line-height:1.5;color:#e2e8f0;}
-        .typing-cursor{display:inline-block;width:3px;height:1.2em;background-color:rgb(var(--foreground));animation:blink 1s infinite;vertical-align:text-bottom;margin-left:2px;}@keyframes blink{0%, 50%{opacity:1;}51%, 100%{opacity:0;}}
-        .hidden { display: none !important; }
-        .keyboard-open{padding-bottom:50vh !important;}
-        .inline-code {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
-            color: rgb(var(--primary));
-            padding: 0.2em 0.5em;
-            border-radius: 0.375rem;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.875em;
-            font-weight: 500;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            box-shadow: 0 1px 3px rgba(99, 102, 241, 0.1);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-        .thinking-indicator {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 1rem 0;
-        }
-        .thinking-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgba(var(--primary), 0.6) 100%);
-            animation: thinking 1.4s infinite ease-in-out;
-            box-shadow: 0 2px 4px rgba(var(--primary), 0.3);
-        }
-        .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
-        .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes thinking {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @media (max-width: 768px){.sidebar{position:fixed;left:0;top:0;height:100%;z-index:40;transform:translateX(-100%);transition:transform 0.3s ease;}.sidebar.open{transform:translateX(0);}.sidebar-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0, 0, 0, 0.5);z-index:30;display:none;}.sidebar-overlay.show{display:block;}}
-        @media (min-width: 769px){#app{flex-direction:row;} .sidebar{width:var(--sidebar-width);}}
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgb(var(--muted)); transition: .3s; border-radius: 24px; }
-        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .toggle-slider { background-color: rgb(var(--primary)); }
-        input:checked + .toggle-slider:before { transform: translateX(24px); }
-        .modal { animation: modalFadeIn 0.3s ease-out; }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .toast { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .floating-btn { position: fixed; bottom: 2rem; right: 2rem; z-index: 30; }
-        .example-prompt { transition: all 0.2s ease; }
-        .example-prompt:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .input-action-btn { width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content-center; background: none; border: none; color: rgb(var(--muted-foreground)); cursor: pointer; transition: all 0.2s ease; }
-        .input-action-btn:hover { background-color: rgb(var(--accent)); color: rgb(var(--foreground)); }
-        .error-message { background-color: rgb(var(--destructive)); color: rgb(var(--destructive-foreground)); }
-        .active { background-color: rgb(var(--primary)); color: rgb(var(--primary-foreground)); }
-        .active .text-muted-foreground { color: rgb(var(--primary-foreground)/0.8); }
-        .suggestion-chip { transition: all 0.3s ease; cursor: pointer; }
-        .suggestion-chip:hover { transform: translateY(-2px) scale(1.05); }
-        .model-radio { transition: all 0.3s ease; cursor: pointer; }
-        .model-option-btn { transition: all 0.3s ease; cursor: pointer; }
-        .model-option-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-    </style>
 </head>
 <body class="font-sans">
     <div id="app">
@@ -168,7 +52,8 @@
                 </button>
             </div>
         </div>
-        <div class="main-content">
+        
+        <div id="mainContent" class="main-content">
             <header class="border-b border-border bg-background/95 backdrop-blur flex-shrink-0">
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center gap-4">
@@ -181,6 +66,9 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
+                        <button id="viewToggleBtn" class="p-2 hover:bg-accent rounded-lg transition-colors" title="Toggle View">
+                            <i data-lucide="layout" class="h-4 w-4"></i>
+                        </button>
                         <button id="exportBtn" class="p-2 hover:bg-accent rounded-lg transition-colors" title="Export Chat">
                             <i data-lucide="download" class="h-4 w-4"></i>
                         </button>
@@ -190,6 +78,7 @@
                     </div>
                 </div>
             </header>
+            
             <div id="chatContainer" class="chat-container">
                 <div class="max-w-4xl mx-auto">
                     <div id="welcomeScreen" class="welcome-screen text-center py-12">
@@ -262,9 +151,11 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div id="messagesContainer" class="space-y-4 hidden"></div>
                 </div>
             </div>
+            
             <div class="input-area">
                 <div class="input-wrapper">
                     <textarea id="messageInput" placeholder="Message AJ..." class="w-full p-3 pr-20 resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[52px] max-h-48"></textarea>
@@ -282,7 +173,105 @@
                 </div>
             </div>
         </div>
+        
+        <div id="advancedView" class="advanced-view hidden">
+            <div class="advanced-sidebar">
+                <div class="advanced-sidebar-header">
+                    <h3>Conversation Context</h3>
+                    <button id="closeAdvancedBtn" class="p-1 hover:bg-accent rounded">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                </div>
+                <div class="advanced-sidebar-content">
+                    <div class="context-section">
+                        <h4>Current Topic</h4>
+                        <div id="currentTopic" class="context-item">No active conversation</div>
+                    </div>
+                    <div class="context-section">
+                        <h4>Key Points</h4>
+                        <div id="keyPoints" class="context-list"></div>
+                    </div>
+                    <div class="context-section">
+                        <h4>Related Topics</h4>
+                        <div id="relatedTopics" class="context-list"></div>
+                    </div>
+                    <div class="context-section">
+                        <h4>Conversation Stats</h4>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="messageCount">0</div>
+                                <div class="stat-label">Messages</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="wordCount">0</div>
+                                <div class="stat-label">Words</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="topicCount">0</div>
+                                <div class="stat-label">Topics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="advanced-main">
+                <div class="advanced-header">
+                    <div class="advanced-title">
+                        <h2>Advanced Analysis View</h2>
+                        <p>Real-time conversation insights and context visualization</p>
+                    </div>
+                    <div class="advanced-controls">
+                        <button id="insightsBtn" class="advanced-control-btn">
+                            <i data-lucide="brain" class="h-4 w-4"></i>
+                            Insights
+                        </button>
+                        <button id="visualizeBtn" class="advanced-control-btn">
+                            <i data-lucide="bar-chart-3" class="h-4 w-4"></i>
+                            Visualize
+                        </button>
+                        <button id="exportAdvancedBtn" class="advanced-control-btn">
+                            <i data-lucide="download" class="h-4 w-4"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="advanced-content">
+                    <div class="visualization-panel">
+                        <h3>Conversation Flow</h3>
+                        <div id="conversationFlow" class="flow-chart">
+                            <div class="flow-node start">
+                                <div class="node-content">Start</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="insights-panel">
+                        <h3>AI Insights</h3>
+                        <div id="aiInsights" class="insights-content">
+                            <div class="insight-item">
+                                <div class="insight-icon">🧠</div>
+                                <div class="insight-text">Start a conversation to see AI insights and analysis</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="topics-panel">
+                        <h3>Topic Analysis</h3>
+                        <div id="topicsAnalysis" class="topics-content">
+                            <div class="topic-cloud">
+                                <div class="topic-tag">Welcome</div>
+                                <div class="topic-tag">AI Assistant</div>
+                                <div class="topic-tag">Help</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    
     <div id="settingsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:1rem;box-shadow:0 20px 50px rgba(0, 0, 0, 0.2);max-width:32rem;width:90%;margin:0 auto;">
             <div class="p-6 border-b border-border flex items-center justify-between">
@@ -295,6 +284,43 @@
                 </button>
             </div>
             <div class="p-6 space-y-8 max-h-96 overflow-y-auto">
+                <!-- View Mode Selection -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-lg">View Mode</h4>
+                            <p class="text-sm text-muted-foreground">Choose your preferred interface style</p>
+                        </div>
+                        <div class="text-sm text-muted-foreground">
+                            Current: <span id="currentViewDisplay" class="font-medium text-primary">Normal</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3">
+                        <button class="view-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-view="normal">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                                <i data-lucide="message-square" class="h-6 w-6"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium">Normal View</div>
+                                <div class="text-sm text-muted-foreground">Clean, simple chat interface</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 view-radio" data-view="normal"></div>
+                        </button>
+                        <button class="view-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-view="advanced">
+                            <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                                <i data-lucide="layout" class="h-6 w-6"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-medium">Advanced View</div>
+                                <div class="text-sm text-muted-foreground">Claude-like 2-side interface with real-time visualization</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 view-radio" data-view="advanced"></div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border-t border-border pt-6"></div>
+                
                 <!-- AI Model Selection -->
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
@@ -325,9 +351,9 @@
                         </button>
                     </div>
                 </div>
-
+                
                 <div class="border-t border-border pt-6"></div>
-
+                
                 <!-- Appearance Settings -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Appearance</h4>
@@ -348,9 +374,9 @@
                         </label>
                     </div>
                 </div>
-
+                
                 <div class="border-t border-border pt-6"></div>
-
+                
                 <!-- Text Settings -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Text Settings</h4>
@@ -380,423 +406,10 @@
             </div>
         </div>
     </div>
+    
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50"></div>
     
-    <script>
-        // --- FINALIZED SCRIPT WITH MODEL & TYPING FIX ---
-        const defaultSettings = { darkMode: false, typingAnimation: true, fontSize: 'medium', typingSpeed: 'medium' };
-        let state = { chats: [], selectedChatId: null, currentModel: 'grok', chatStatus: 'idle', abortController: null, settings: { ...defaultSettings } };
-        const TYPING_SPEEDS = { slow: 40, medium: 20, fast: 5 };
-        const MODEL_CONFIGS = {
-            grok: { name: 'AJ-Fast', apiModel: 'llama3-8b-8192', color: 'from-blue-500 to-purple-600', icon: 'AJ', endpoint: '/api/chat' },
-            gemini: { name: 'AJ-Creative', apiModel: 'gemini-1.5-flash', color: 'from-purple-500 to-pink-600', icon: 'AJ', endpoint: '/api/chat' }
-        };
-        const D = { html: document.documentElement, chatContainer: document.getElementById('chatContainer'), welcomeScreen: document.getElementById('welcomeScreen'), messagesContainer: document.getElementById('messagesContainer'), messageInput: document.getElementById('messageInput'), sendBtn: document.getElementById('sendBtn'), chatList: document.getElementById('chatList'), settingsModal: document.getElementById('settingsModal'), sidebar: document.getElementById('sidebar'), sidebarOverlay: document.getElementById('sidebarOverlay') };
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            loadState();
-            applySettings();
-            initializeEventListeners();
-            selectChat(state.selectedChatId || state.chats[0]?.id || createNewChat(false));
-        });
-        function initializeEventListeners() {
-            document.getElementById('mobileMenuBtn').addEventListener('click', toggleSidebar);
-            document.getElementById('newChatBtn').addEventListener('click', () => createNewChat(true));
-            document.getElementById('clearBtn').addEventListener('click', clearChat);
-            document.getElementById('exportBtn').addEventListener('click', () => showToast('Export feature coming soon!', 'info'));
-            document.getElementById('attachBtn').addEventListener('click', () => showToast('File attachments coming soon!', 'info'));
-            document.getElementById('voiceBtn').addEventListener('click', () => showToast('Voice input coming soon!', 'info'));
-            document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
-            document.getElementById('closeSettingsBtn').addEventListener('click', () => D.settingsModal.classList.add('hidden'));
-            document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-            document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
-            D.messageInput.addEventListener('keydown', handleInputKeydown);
-            D.messageInput.addEventListener('input', () => { D.messageInput.style.height = 'auto'; D.messageInput.style.height = `${D.messageInput.scrollHeight}px`; });
-            D.messageInput.addEventListener('focus', () => D.chatContainer.classList.add('keyboard-open'));
-            D.messageInput.addEventListener('blur', () => D.chatContainer.classList.remove('keyboard-open'));
-            D.sendBtn.addEventListener('click', sendMessage);
-            document.getElementById('searchInput').addEventListener('input', (e) => renderChatList(e.target.value.toLowerCase()));
-            document.querySelectorAll('.example-prompt').forEach(el => el.addEventListener('click', (e) => { D.messageInput.value = e.currentTarget.dataset.prompt; sendMessage(); }));
-            document.querySelectorAll('.fontSizeBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.fontSizeBtn')));
-            document.querySelectorAll('.typingSpeedBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.typingSpeedBtn')));
-            
-            // Add model selection listeners
-            document.querySelectorAll('.model-option-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const model = e.currentTarget.dataset.model;
-                    selectModelInSettings(model);
-                });
-            });
-        }
-        async function sendMessage() {
-            const messageText = D.messageInput.value.trim();
-            if (!messageText || !state.selectedChatId || state.chatStatus !== 'idle') return;
-            const chat = state.chats.find(c => c.id === state.selectedChatId);
-            if (!chat) return;
-            setChatStatus('waiting');
-            chat.messages.push({ id: crypto.randomUUID(), sender: 'user', text: messageText, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-            const aiMessage = { id: crypto.randomUUID(), sender: 'ai', text: '', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), aiType: state.currentModel, isStreaming: true };
-            chat.messages.push(aiMessage);
-            if (chat.messages.length === 2 && chat.title === 'New Conversation') {
-                chat.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
-            }
-            D.messageInput.value = ''; D.messageInput.style.height = 'auto';
-            renderChatList();
-            renderMessages();
-            saveState();
-            state.abortController = new AbortController();
-            try {
-                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        ai: state.currentModel, 
-                        messages: chat.messages.slice(0, -1).map(m => ({ 
-                            role: m.sender === 'user' ? 'user' : 'assistant', 
-                            content: m.text 
-                        })) 
-                    }),
-                    signal: state.abortController.signal
-                });
-                console.log('API Response Status:', response.status);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                setChatStatus('streaming');
-                const data = await response.json();
-                console.log('API Response:', data);
-                
-                // Handle the response from our API
-                if (data.response) {
-                    aiMessage.text = data.response;
-                    aiMessage.isStreaming = false;
-                    renderMessages();
-                } else {
-                    throw new Error('No response from API');
-                }
-                
-            } catch (error) {
-                console.error('Error in sendMessage:', error);
-                if (error.name === 'AbortError') { 
-                    aiMessage.text += "\n\n*Generation stopped by user.*"; 
-                } else {
-                    aiMessage.text = `Sorry, I encountered an error: ${error.message}`;
-                    aiMessage.isError = true;
-                }
-            } finally {
-                aiMessage.isStreaming = false;
-                setChatStatus('idle');
-                renderMessages();
-                saveState();
-            }
-        }
-        function renderMessages() {
-            const chat = state.chats.find(c => c.id === state.selectedChatId);
-            if (!chat || chat.messages.length === 0) { 
-                D.welcomeScreen.classList.remove('hidden'); 
-                D.messagesContainer.classList.add('hidden'); 
-                return; 
-            }
-            D.welcomeScreen.classList.add('hidden'); 
-            D.messagesContainer.classList.remove('hidden');
-            
-            D.messagesContainer.innerHTML = chat.messages.map((msg, index) => {
-                const config = MODEL_CONFIGS[msg.aiType || 'grok'];
-                const senderIcon = msg.sender === 'user' ? 
-                    `<div class="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-bold">U</div>` : 
-                    `<div class="w-8 h-8 rounded-full bg-gradient-to-r ${config.color} flex-shrink-0 flex items-center justify-center text-white font-bold">${config.icon}</div>`;
-                
-                let content = '';
-                if (msg.isStreaming) {
-                    content = `<div class="thinking-indicator"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div>`;
-                } else {
-                    content = processMessageText(msg.text);
-                }
-                
-                const messageBubble = `
-                    <div class="message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'} ${msg.isError ? 'error-message' : ''}">
-                        <div class="message-content">${content}</div>
-                        ${!msg.isStreaming ? `<div class="flex items-center justify-between mt-2"><span class="text-xs opacity-70">${msg.timestamp}</span><div class="flex gap-1">${msg.sender === 'ai' ? `<button onclick="regenerateResponse(${index})" class="p-1 hover:bg-accent rounded transition-colors" title="Regenerate"><i data-lucide="refresh-cw" class="h-3 w-3"></i></button>` : ''}<button onclick="copyMessage('${escapeHtml(msg.text)}')" class="p-1 hover:bg-accent rounded transition-colors" title="Copy"><i data-lucide="copy" class="h-3 w-3"></i></button></div></div>` : ''}
-                    </div>`;
-                    
-                return `<div id="message-${msg.id}" class="flex gap-3 fade-in ${msg.sender === 'user' ? 'justify-end' : ''}">${msg.sender === 'user' ? messageBubble + senderIcon : senderIcon + messageBubble}</div>`;
-            }).join('');
-            
-            lucide.createIcons();
-            if(!chat.messages[chat.messages.length - 1].isStreaming) scrollToBottom(D.chatContainer);
-        }
-        function renderChatList(searchQuery = '') { 
-            const filtered = state.chats.filter(c => c.title.toLowerCase().includes(searchQuery)); 
-            if (filtered.length === 0) { 
-                D.chatList.innerHTML = `<div class="text-center text-muted-foreground py-4 text-sm">No chats found</div>`; 
-                return; 
-            } 
-            D.chatList.innerHTML = filtered.map(chat => { 
-                const config = MODEL_CONFIGS[chat.model]; 
-                return `<div class="chat-item ${state.selectedChatId === chat.id ? 'active' : ''}" onclick="selectChat('${chat.id}')"><div class="chat-item-icon bg-gradient-to-r ${config.color} text-white">${config.icon}</div><div class="flex-1 min-w-0"><h3 class="font-medium truncate">${escapeHtml(chat.title)}</h3><p class="text-xs text-muted-foreground">${chat.date}</p></div><button onclick="deleteChat(event, '${chat.id}')" class="p-1 opacity-50 hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground rounded transition-colors"><i data-lucide="trash-2" class="h-3 w-3"></i></button></div>`; 
-            }).join(''); 
-            lucide.createIcons(); 
-        }
-        function createNewChat(select = true) { 
-            const chat = { 
-                id: crypto.randomUUID(), 
-                title: 'New Conversation', 
-                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), 
-                model: state.currentModel, 
-                messages: [] 
-            }; 
-            state.chats.unshift(chat); 
-            if (select) selectChat(chat.id); 
-            return chat.id; 
-        }
-        function selectChat(id) { 
-            if (!id && state.chats.length > 0) id = state.chats[0].id; 
-            if (!id) return; 
-            state.selectedChatId = id; 
-            const chat = state.chats.find(c => c.id === id); 
-            if (chat) { 
-                state.currentModel = chat.model; 
-                renderMessages(); 
-            } 
-            renderChatList(); 
-            saveState(); 
-            if (window.innerWidth <= 768 && D.sidebar.classList.contains('open')) { 
-                toggleSidebar(); 
-            } 
-        }
-        function deleteChat(e, id) { 
-            e.stopPropagation(); 
-            if (!confirm('Delete this conversation?')) return; 
-            state.chats = state.chats.filter(c => c.id !== id); 
-            if (state.selectedChatId === id) { 
-                selectChat(state.chats[0]?.id); 
-            } else { 
-                renderChatList(); 
-            } 
-            saveState(); 
-            showToast('Chat deleted', 'success'); 
-        }
-        function clearChat() { 
-            if (!state.selectedChatId || !confirm('Clear all messages in this conversation?')) return; 
-            const chat = state.chats.find(c => c.id === state.selectedChatId); 
-            if (chat) { 
-                chat.messages = []; 
-                renderMessages(); 
-                saveState(); 
-                showToast('Conversation cleared', 'success'); 
-            } 
-        }
-        async function regenerateResponse(index) { 
-            if (state.chatStatus !== 'idle') return; 
-            const chat = state.chats.find(c => c.id === state.selectedChatId); 
-            if (!chat || index < 1 || chat.messages[index-1]?.sender !== 'user') return; 
-            D.messageInput.value = chat.messages[index-1].text; 
-            chat.messages.splice(index-1); 
-            await sendMessage(); 
-        }
-        function openSettingsModal() { 
-            document.getElementById('darkModeToggle').checked = state.settings.darkMode; 
-            document.getElementById('typingToggle').checked = state.settings.typingAnimation; 
-            setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn'); 
-            setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn');
-            
-            // Update model selection UI
-            updateModelSelectionUI();
-            
-            D.settingsModal.classList.remove('hidden'); 
-        }
-        
-        function updateModelSelectionUI() {
-            // Update current model display
-            const currentModelDisplay = document.getElementById('currentModelDisplay');
-            if (currentModelDisplay) {
-                currentModelDisplay.textContent = MODEL_CONFIGS[state.currentModel].name;
-            }
-            
-            // Update radio buttons
-            document.querySelectorAll('.model-radio').forEach(radio => {
-                const model = radio.dataset.model;
-                if (model === state.currentModel) {
-                    radio.style.backgroundColor = 'rgb(var(--primary))';
-                    radio.style.borderColor = 'rgb(var(--primary))';
-                    radio.innerHTML = '<div style="width: 100%; height: 100%; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center;"><div style="width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--primary));"></div></div>';
-                } else {
-                    radio.style.backgroundColor = 'transparent';
-                    radio.style.borderColor = 'rgb(var(--muted-foreground), 0.3)';
-                    radio.innerHTML = '';
-                }
-            });
-            
-            // Update button borders
-            document.querySelectorAll('.model-option-btn').forEach(btn => {
-                const model = btn.dataset.model;
-                if (model === state.currentModel) {
-                    btn.style.borderColor = 'rgb(var(--primary))';
-                    btn.style.backgroundColor = 'rgba(var(--primary), 0.1)';
-                } else {
-                    btn.style.borderColor = 'transparent';
-                    btn.style.backgroundColor = 'transparent';
-                }
-            });
-        }
-        
-        function selectModelInSettings(model) {
-            state.currentModel = model;
-            updateModelSelectionUI();
-            
-            // Update current chat model if exists
-            if (state.selectedChatId) {
-                const chat = state.chats.find(c => c.id === state.selectedChatId);
-                if (chat) {
-                    chat.model = model;
-                }
-            }
-            
-            showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info');
-        }
-        function saveSettings() { 
-            state.settings.darkMode = document.getElementById('darkModeToggle').checked; 
-            state.settings.typingAnimation = document.getElementById('typingToggle').checked; 
-            state.settings.fontSize = document.querySelector('.fontSizeBtn.active').dataset.size; 
-            state.settings.typingSpeed = document.querySelector('.typingSpeedBtn.active').dataset.speed; 
-            applySettings(); 
-            saveState(); 
-            D.settingsModal.classList.add('hidden'); 
-            showToast('Settings saved!', 'success'); 
-        }
-        function resetSettings() { 
-            state.settings = { ...defaultSettings }; 
-            openSettingsModal(); 
-        }
-        function applySettings() { 
-            D.html.classList.toggle('dark', state.settings.darkMode); 
-            const sizeMap = { 
-                small: 'var(--font-size-sm)', 
-                medium: 'var(--font-size-base)', 
-                large: 'var(--font-size-lg)' 
-            }; 
-            D.html.style.fontSize = sizeMap[state.settings.fontSize]; 
-        }
-        function saveState() { 
-            localStorage.setItem('ajstudioz_chats', JSON.stringify(state.chats)); 
-            localStorage.setItem('ajstudioz_settings', JSON.stringify(state.settings)); 
-            localStorage.setItem('ajstudioz_lastChatId', state.selectedChatId); 
-        }
-        function loadState() { 
-            const chats = localStorage.getItem('ajstudioz_chats'); 
-            const settings = localStorage.getItem('ajstudioz_settings'); 
-            const lastChatId = localStorage.getItem('ajstudioz_lastChatId'); 
-            if (chats) state.chats = JSON.parse(chats); 
-            if (settings) state.settings = { ...defaultSettings, ...JSON.parse(settings) }; 
-            if (lastChatId) state.selectedChatId = lastChatId; 
-        }
-        function setChatStatus(status) { 
-            state.chatStatus = status; 
-            if (status === 'waiting' || status === 'streaming') { 
-                D.messageInput.disabled = true; 
-                D.messageInput.placeholder = 'AI is responding...'; 
-                if (status === 'streaming') { 
-                    D.sendBtn.innerHTML = `<i data-lucide="square" class="h-4 w-4"></i>`; 
-                    D.sendBtn.onclick = () => state.abortController?.abort(); 
-                    D.sendBtn.title = "Stop Generating"; 
-                } else { 
-                    D.sendBtn.innerHTML = `<div class="spinner"></div>`; 
-                    D.sendBtn.onclick = null; 
-                } 
-                D.sendBtn.disabled = false; 
-            } else { 
-                D.sendBtn.disabled = false; 
-                D.sendBtn.innerHTML = `<i data-lucide="send" class="h-4 w-4"></i>`; 
-                D.sendBtn.onclick = sendMessage; 
-                D.sendBtn.title = "Send Message"; 
-                D.messageInput.disabled = false; 
-                D.messageInput.placeholder = 'Message AJ...'; 
-            } 
-            lucide.createIcons(); 
-        }
-        function toggleSidebar() { 
-            D.sidebar.classList.toggle('open'); 
-            D.sidebarOverlay.classList.toggle('show'); 
-        }
-        function handleInputKeydown(e) { 
-            if (e.key === 'Enter' && !e.shiftKey) { 
-                e.preventDefault(); 
-                sendMessage(); 
-            } 
-        }
-        function setActiveButton(target, selector) { 
-            document.querySelectorAll(selector).forEach(btn => { 
-                btn.classList.remove('active', 'bg-primary', 'text-primary-foreground'); 
-                btn.classList.add('bg-secondary', 'text-secondary-foreground'); 
-            }); 
-            target.classList.add('active', 'bg-primary', 'text-primary-foreground'); 
-            target.classList.remove('bg-secondary', 'text-secondary-foreground'); 
-        }
-        function setSuggestion(text) {
-            D.messageInput.value = text;
-            D.messageInput.focus();
-            sendMessage();
-        }
-        
-        function showToast(message, type = 'info') { 
-            const toastContainer = document.getElementById('toastContainer'); 
-            const toast = document.createElement('div'); 
-            const colors = { 
-                success: 'bg-green-500', 
-                error: 'bg-red-500', 
-                info: 'bg-blue-500' 
-            }; 
-            toast.className = `toast ${colors[type]} text-white`; 
-            toast.style.cssText = 'background-color:rgb(var(--card));color:rgb(var(--foreground));border:1px solid hsl(var(--border));border-radius:0.5rem;padding:0.75rem 1rem;box-shadow:0 4px 12px rgba(0, 0, 0, 0.05);margin-bottom:0.5rem;animation:slideIn 0.3s ease-out;'; 
-            toast.textContent = message; 
-            toastContainer.appendChild(toast); 
-            setTimeout(() => { 
-                toast.style.opacity = '0'; 
-                setTimeout(() => toastContainer.removeChild(toast), 300); 
-            }, 3000); 
-        }
-        function processMessageText(text) {
-            if (!text) return '';
-            let html = escapeHtml(text).replace(/\n/g, '<br>');
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                       .replace(/\*(.*?)\*/g, '<em>$1</em>');
-            html = html.replace(/```(\w*)\s*<br>([\s\S]*?)<br>```/g, (_, lang, code) => {
-                const language = lang || 'text';
-                const decodedCode = code.replace(/<br>/g, '\n');
-                return `</div><div class="code-block" data-code="${escapeHtml(decodedCode)}">
-                    <div class="code-header">
-                        <span>${language}</span>
-                        <button onclick="copyCode(this)">
-                            <i data-lucide="copy" class="h-3 w-3"></i>Copy
-                        </button>
-                    </div>
-                    <div class="code-content">
-                        <pre><code>${decodedCode}</code></pre>
-                    </div>
-                </div><div class="message-content">`;
-            });
-            html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-            html = html.replace(/^\s*[-*]\s+(.*)$/gm, '<ul><li>$1</li></ul>')
-                       .replace(/<\/ul><br><ul>/g, '');
-            html = html.replace(/^\s*\d+\.\s+(.*)$/gm, '<ol><li>$1</li></ol>')
-                       .replace(/<\/ol><br><ol>/g, '');
-            return html;
-        }
-        function isScrolledToBottom(el) { 
-            return el.scrollHeight - el.scrollTop - el.clientHeight < 50; 
-        }
-        function scrollToBottom(el, behavior = 'smooth') { 
-            el.scrollTo({ top: el.scrollHeight, behavior: behavior }); 
-        }
-        function escapeHtml(text) { 
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
-        }
-        function copyMessage(text) { 
-            navigator.clipboard.writeText(text).then(() => showToast('Message copied!', 'success')); 
-        }
-        function copyCode(btn) { 
-            const code = btn.closest('.code-block').dataset.code; 
-            navigator.clipboard.writeText(code).then(() => showToast('Code copied!', 'success')); 
-        }
-    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
