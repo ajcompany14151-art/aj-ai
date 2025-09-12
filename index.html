@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AJ - AI Assistant by AJ STUDIOZ</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--background: 255, 255, 255;--foreground: 15, 23, 42;--card: 255, 255, 255;--card-foreground: 15, 23, 42;--popover: 255, 255, 255;--popover-foreground: 15, 23, 42;--primary: 59, 130, 246;--primary-foreground: 255, 255, 255;--secondary: 241, 245, 249;--secondary-foreground: 15, 23, 42;--muted: 248, 250, 252;--muted-foreground: 100, 116, 139;--accent: 241, 245, 249;--accent-foreground: 15, 23, 42;--destructive: 239, 68, 68;--destructive-foreground: 255, 255, 255;--border: 226, 232, 240;--input: 255, 255, 255;--ring: 59, 130, 246;--radius: 0.5rem;--sidebar-width: 260px; --font-size-base: 0.95rem; --font-size-sm: 0.875rem; --font-size-lg: 1.05rem;}
+        .dark{--background: 15, 23, 42;--foreground: 248, 250, 252;--card: 30, 41, 59;--card-foreground: 248, 250, 252;--popover: 30, 41, 59;--popover-foreground: 248, 250, 252;--primary: 99, 102, 241;--primary-foreground: 15, 23, 42;--secondary: 51, 65, 85;--secondary-foreground: 248, 250, 252;--muted: 30, 41, 59;--muted-foreground: 148, 163, 184;--accent: 51, 65, 85;--accent-foreground: 248, 250, 252;--destructive: 239, 68, 68;--destructive-foreground: 248, 250, 252;--border: 51, 65, 85;--input: 30, 41, 59;--ring: 99, 102, 241;}
+        *{border-color:hsl(var(--border));}
+        html { font-size: var(--font-size-base); }
+        body{background-color:rgb(var(--background));color:rgb(var(--foreground));font-family:'Inter', sans-serif;line-height:1.5;margin:0;padding:0;height:100vh;overflow:hidden;position:fixed;width:100%;}
+        #app{display:flex;flex-direction:column;height:100vh;overflow:hidden;width:100%;}
+        .main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100%;}
+        .chat-container{flex:1;overflow-y:auto;padding:1rem;padding-bottom:150px;scroll-behavior:smooth;}
+        .sidebar{background-color:rgb(var(--card));border-right:1px solid hsl(var(--border));width:var(--sidebar-width);flex-shrink:0;display:flex;flex-direction:column;}
+        .chat-item{padding:0.75rem;border-radius:0.5rem;cursor:pointer;margin-bottom:0.25rem;transition:all 0.2s ease;display:flex;align-items:center;gap:0.75rem;}
+        .chat-item:hover{background-color:rgb(var(--accent));}
+        .chat-item.active{background-color:rgb(var(--primary)); color: rgb(var(--primary-foreground));}
+        .chat-item.active .text-muted-foreground { color: rgb(var(--primary-foreground)/0.8); }
+        .message-bubble{border-radius:0.75rem;padding:1rem;max-width:85%;word-wrap:break-word;position:relative;transition: all 0.2s ease;}
+        .user-message{background-color:rgb(var(--primary));color:rgb(var(--primary-foreground));border-bottom-right-radius:0.25rem;margin-left:auto;box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);}
+        .ai-message{background-color:rgb(var(--muted));color:rgb(var(--foreground));border-bottom-left-radius:0.25rem;line-height:1.6;position: relative;border: 1px solid hsl(var(--border));box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);}
+        .ai-message p, .ai-message ul, .ai-message ol { margin-bottom: 1rem; }
+        .ai-message ul, .ai-message ol { padding-left: 1.5rem; }
+        .input-area{border-top:1px solid hsl(var(--border));padding:1rem;background-color:rgb(var(--background));flex-shrink:0;position:fixed;bottom:0;left:0;right:0;z-index:10;width:100%;}
+        .input-wrapper{max-width:48rem;margin:0 auto;position:relative;}
+        .input-area textarea{border:1px solid hsl(var(--border));border-radius:0.75rem;padding:0.875rem 1rem;padding-right:6.5rem;resize:none;background-color:rgb(var(--input));color:rgb(var(--foreground));transition:border-color 0.2s ease, box-shadow 0.2s ease;font-family:'Inter', sans-serif;max-height:200px;width:100%;}
+        .input-area textarea:focus{border-color:rgb(var(--primary));outline:none;box-shadow:0 0 0 3px rgba(var(--primary), 0.2);}
+        .input-actions{position:absolute;right:0.75rem;top:50%;transform: translateY(-50%);display:flex;align-items:center;gap:0.25rem;}
+        .send-btn{width:2.5rem;height:2.5rem;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;background-color:rgb(var(--primary));color:rgb(var(--primary-foreground));border:none;cursor:pointer;transition:all 0.2s ease;}
+        .send-btn:hover{background-color:rgb(var(--primary) / 0.9);}
+        .send-btn:disabled{opacity:0.5;cursor:not-allowed;}
+        .code-block{background-color:#1e293b;border-radius:0.5rem;overflow:hidden;margin:0.75rem 0;position:relative;border: 1px solid hsl(var(--border));box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);}
+        .code-header{background-color:#334155;padding:0.5rem 0.75rem;display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;font-family:'Roboto Mono', monospace;color:#cbd5e1;}
+        .code-header button{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;gap:0.25rem;transition:color 0.2s ease;}
+        .code-header button:hover{color:white;}
+        .code-content{padding:0.75rem;overflow-x:auto;}
+        .code-content pre{margin:0;font-family:'Roboto Mono', monospace;font-size:0.875rem;line-height:1.5;color:#e2e8f0;}
+        .typing-cursor{display:inline-block;width:3px;height:1.2em;background-color:rgb(var(--foreground));animation:blink 1s infinite;vertical-align:text-bottom;margin-left:2px;}@keyframes blink{0%, 50%{opacity:1;}51%, 100%{opacity:0;}}
+        .hidden { display: none !important; }
+        .keyboard-open{padding-bottom:50vh !important;}
+        .inline-code {
+            background-color: rgba(var(--muted-foreground), 0.1);
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9em;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .thinking-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.5rem 0;
+        }
+        .thinking-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgb(var(--muted-foreground));
+            animation: thinking 1.4s infinite ease-in-out;
+        }
+        .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+        .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes thinking {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px){.sidebar{position:fixed;left:0;top:0;height:100%;z-index:40;transform:translateX(-100%);transition:transform 0.3s ease;}.sidebar.open{transform:translateX(0);}.sidebar-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0, 0, 0, 0.5);z-index:30;display:none;}.sidebar-overlay.show{display:block;}}
+        @media (min-width: 769px){#app{flex-direction:row;} .sidebar{width:var(--sidebar-width);}}
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgb(var(--muted)); transition: .3s; border-radius: 24px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: rgb(var(--primary)); }
+        input:checked + .toggle-slider:before { transform: translateX(24px); }
+        .modal { animation: modalFadeIn 0.3s ease-out; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .toast { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .floating-btn { position: fixed; bottom: 2rem; right: 2rem; z-index: 30; }
+        .example-prompt { transition: all 0.2s ease; }
+        .example-prompt:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .input-action-btn { width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content-center; background: none; border: none; color: rgb(var(--muted-foreground)); cursor: pointer; transition: all 0.2s ease; }
+        .input-action-btn:hover { background-color: rgb(var(--accent)); color: rgb(var(--foreground)); }
+        .error-message { background-color: rgb(var(--destructive)); color: rgb(var(--destructive-foreground)); }
+        .active { background-color: rgb(var(--primary)); color: rgb(var(--primary-foreground)); }
+        .active .text-muted-foreground { color: rgb(var(--primary-foreground)/0.8); }
+    </style>
+</head>
+<body class="font-sans">
+    <div id="app">
+        <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">AJ</div>
+                    <div>
+                        <h2 class="text-xl font-bold">AI Assistant</h2>
+                        <p class="text-xs text-muted-foreground">by AJ STUDIOZ</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <button id="newChatBtn" class="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 font-medium mb-4">
+                    <i data-lucide="plus" class="h-4 w-4"></i>New Chat
+                </button>
+                <div class="relative mb-4">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"></i>
+                    <input id="searchInput" type="text" placeholder="Search chats..." class="w-full pl-10 pr-4 py-2 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring">
+                </div>
+                <div class="mb-2">
+                    <h3 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Recent Chats</h3>
+                    <div id="chatList" class="space-y-1"></div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="ai-info-card" style="background-color:rgb(var(--muted));border-radius:0.75rem;padding:1rem;margin-bottom:1rem;border:1px solid hsl(var(--border));">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                        <div>
+                            <h3 class="font-semibold">AI Assistant</h3>
+                            <p class="text-xs text-muted-foreground">Created by AJ STUDIOZ</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-muted-foreground">AJ is an advanced AI assistant designed to help with a wide range of tasks, from answering questions to generating creative content.</p>
+                </div>
+                <button id="settingsBtn" class="w-full py-2 px-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors flex items-center justify-center gap-2 font-medium">
+                    <i data-lucide="settings" class="h-4 w-4"></i>Settings
+                </button>
+            </div>
+        </div>
+        <div class="main-content">
+            <header class="border-b border-border bg-background/95 backdrop-blur flex-shrink-0">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center gap-4">
+                        <button id="mobileMenuBtn" class="md:hidden p-2 hover:bg-accent rounded-lg transition-colors">
+                            <i data-lucide="menu" class="h-5 w-5"></i>
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">AJ</div>
+                            <h1 class="text-lg font-semibold">AI Assistant</h1>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="exportBtn" class="p-2 hover:bg-accent rounded-lg transition-colors" title="Export Chat">
+                            <i data-lucide="download" class="h-4 w-4"></i>
+                        </button>
+                        <button id="clearBtn" class="p-2 hover:bg-accent rounded-lg transition-colors" title="Clear Chat">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <div id="chatContainer" class="chat-container">
+                <div class="max-w-4xl mx-auto">
+                    <div id="welcomeScreen" class="welcome-screen text-center py-12">
+                        <div class="mb-10">
+                            <div class="flex items-center justify-center gap-3 mb-6">
+                                <div class="w-20 h-20 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg text-2xl animate-pulse">AJ</div>
+                                <h2 class="text-4xl font-bold">AI Assistant</h2>
+                            </div>
+                            <p class="text-muted-foreground text-lg max-w-2xl mx-auto">Hello, I'm AJ. How can I help you today?</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                            <div class="example-prompt bg-card hover:shadow-md transition-all duration-200" data-prompt="Explain quantum computing in simple terms" style="border:1px solid hsl(var(--border));border-radius:0.75rem;padding:1rem;cursor:pointer;">
+                                <h3 class="font-medium mb-2">Explain quantum computing</h3>
+                                <p class="text-sm text-muted-foreground">Simple explanation of quantum computing concepts</p>
+                            </div>
+                            <div class="example-prompt bg-card hover:shadow-md transition-all duration-200" data-prompt="Write a Python function to calculate fibonacci sequence" style="border:1px solid hsl(var(--border));border-radius:0.75rem;padding:1rem;cursor:pointer;">
+                                <h3 class="font-medium mb-2">Python fibonacci function</h3>
+                                <p class="text-sm text-muted-foreground">Generate code for fibonacci sequence calculation</p>
+                            </div>
+                            <div class="example-prompt bg-card hover:shadow-md transition-all duration-200" data-prompt="Create a workout plan for beginners" style="border:1px solid hsl(var(--border));border-radius:0.75rem;padding:1rem;cursor:pointer;">
+                                <h3 class="font-medium mb-2">Beginner workout plan</h3>
+                                <p class="text-sm text-muted-foreground">Design a weekly workout routine for beginners</p>
+                            </div>
+                            <div class="example-prompt bg-card hover:shadow-md transition-all duration-200" data-prompt="Explain the theory of relativity" style="border:1px solid hsl(var(--border));border-radius:0.75rem;padding:1rem;cursor:pointer;">
+                                <h3 class="font-medium mb-2">Theory of relativity</h3>
+                                <p class="text-sm text-muted-foreground">Explain Einstein's theory in simple terms</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="messagesContainer" class="space-y-4 hidden"></div>
+                </div>
+            </div>
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="messageInput" placeholder="Message AJ..." class="w-full p-3 pr-20 resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[52px] max-h-48"></textarea>
+                    <div class="input-actions">
+                        <button id="attachBtn" class="input-action-btn" title="Attach File">
+                            <i data-lucide="paperclip" class="h-4 w-4"></i>
+                        </button>
+                        <button id="voiceBtn" class="input-action-btn" title="Voice Input">
+                            <i data-lucide="mic" class="h-4 w-4"></i>
+                        </button>
+                        <button id="sendBtn" class="send-btn" title="Send Message">
+                            <i data-lucide="send" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="floating-btn">
+        <button id="modelBtn" class="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200">
+            <span class="text-xl font-bold">AJ</span>
+        </button>
+    </div>
+    <div id="modelModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:0.75rem;box-shadow:0 10px 25px rgba(0, 0, 0, 0.1);max-width:28rem;width:90%;margin:0 auto;">
+            <div class="p-6 border-b border-border flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Select AI Model</h3>
+                <button id="closeModelBtn" class="p-2 hover:bg-accent rounded-lg transition-colors">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <button class="model-option w-full p-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-4 text-left border border-border" data-model="grok">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                    <div>
+                        <div class="font-medium">AJ-Fast</div>
+                        <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
+                    </div>
+                </button>
+                <button class="model-option w-full p-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-4 text-left border border-border" data-model="gemini">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                    <div>
+                        <div class="font-medium">AJ-Creative</div>
+                        <div class="text-sm text-muted-foreground">Enhanced creativity and reasoning</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:0.75rem;box-shadow:0 10px 25px rgba(0, 0, 0, 0.1);max-width:28rem;width:90%;margin:0 auto;">
+            <div class="p-6 border-b border-border flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Settings</h3>
+                <button id="closeSettingsBtn" class="p-2 hover:bg-accent rounded-lg transition-colors">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="flex items-center justify-between">
+                    <label for="darkModeToggle" class="font-medium">Dark Mode</label>
+                    <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <label for="typingToggle" class="font-medium">Typing Animation</label>
+                    <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                        <input type="checkbox" id="typingToggle" checked>
+                        <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                    </label>
+                </div>
+                <div class="space-y-3">
+                    <label class="font-medium">Font Size</label>
+                    <div class="flex gap-2">
+                        <button class="fontSizeBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-size="small">Small</button>
+                        <button class="fontSizeBtn w-full py-2" data-size="medium">Medium</button>
+                        <button class="fontSizeBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-size="large">Large</button>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="font-medium">Typing Speed</label>
+                    <div class="flex gap-2">
+                        <button class="typingSpeedBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-speed="slow">Slow</button>
+                        <button class="typingSpeedBtn w-full py-2" data-speed="medium">Medium</button>
+                        <button class="typingSpeedBtn w-full py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80" data-speed="fast">Fast</button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-border flex gap-3">
+                <button id="resetSettingsBtn" class="w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80">Reset</button>
+                <button id="saveSettingsBtn" class="w-full py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">Save</button>
+            </div>
+        </div>
+    </div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50"></div>
+    
+    <script>
+        // --- FINALIZED SCRIPT WITH MODEL & TYPING FIX ---
+        const defaultSettings = { darkMode: false, typingAnimation: true, fontSize: 'medium', typingSpeed: 'medium' };
+        let state = { chats: [], selectedChatId: null, currentModel: 'grok', chatStatus: 'idle', abortController: null, settings: { ...defaultSettings } };
+        const TYPING_SPEEDS = { slow: 40, medium: 20, fast: 5 };
+        const MODEL_CONFIGS = {
+            grok: { name: 'AJ-Fast', apiModel: 'llama3-8b-8192', color: 'from-blue-500 to-purple-600', icon: 'AJ', endpoint: '/api/chat' },
+            gemini: { name: 'AJ-Creative', apiModel: 'gemini-1.5-flash', color: 'from-purple-500 to-pink-600', icon: 'AJ', endpoint: '/api/chat' }
+        };
+        const D = { html: document.documentElement, chatContainer: document.getElementById('chatContainer'), welcomeScreen: document.getElementById('welcomeScreen'), messagesContainer: document.getElementById('messagesContainer'), messageInput: document.getElementById('messageInput'), sendBtn: document.getElementById('sendBtn'), chatList: document.getElementById('chatList'), modelModal: document.getElementById('modelModal'), settingsModal: document.getElementById('settingsModal'), sidebar: document.getElementById('sidebar'), sidebarOverlay: document.getElementById('sidebarOverlay') };
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadState();
+            applySettings();
+            initializeEventListeners();
+            selectChat(state.selectedChatId || state.chats[0]?.id || createNewChat(false));
+        });
+        function initializeEventListeners() {
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleSidebar);
+            document.getElementById('newChatBtn').addEventListener('click', () => createNewChat(true));
+            document.getElementById('clearBtn').addEventListener('click', clearChat);
+            document.getElementById('exportBtn').addEventListener('click', () => showToast('Export feature coming soon!', 'info'));
+            document.getElementById('attachBtn').addEventListener('click', () => showToast('File attachments coming soon!', 'info'));
+            document.getElementById('voiceBtn').addEventListener('click', () => showToast('Voice input coming soon!', 'info'));
+            document.getElementById('modelBtn').addEventListener('click', () => D.modelModal.classList.remove('hidden'));
+            document.getElementById('closeModelBtn').addEventListener('click', () => D.modelModal.classList.add('hidden'));
+            document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
+            document.getElementById('closeSettingsBtn').addEventListener('click', () => D.settingsModal.classList.add('hidden'));
+            document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+            document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+            D.messageInput.addEventListener('keydown', handleInputKeydown);
+            D.messageInput.addEventListener('input', () => { D.messageInput.style.height = 'auto'; D.messageInput.style.height = `${D.messageInput.scrollHeight}px`; });
+            D.messageInput.addEventListener('focus', () => D.chatContainer.classList.add('keyboard-open'));
+            D.messageInput.addEventListener('blur', () => D.chatContainer.classList.remove('keyboard-open'));
+            D.sendBtn.addEventListener('click', sendMessage);
+            document.getElementById('searchInput').addEventListener('input', (e) => renderChatList(e.target.value.toLowerCase()));
+            document.querySelectorAll('.example-prompt').forEach(el => el.addEventListener('click', (e) => { D.messageInput.value = e.currentTarget.dataset.prompt; sendMessage(); }));
+            document.querySelectorAll('.model-option').forEach(el => el.addEventListener('click', (e) => selectModel(e.currentTarget.dataset.model)));
+            document.querySelectorAll('.fontSizeBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.fontSizeBtn')));
+            document.querySelectorAll('.typingSpeedBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.typingSpeedBtn')));
+        }
+        async function sendMessage() {
+            const messageText = D.messageInput.value.trim();
+            if (!messageText || !state.selectedChatId || state.chatStatus !== 'idle') return;
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat) return;
+            setChatStatus('waiting');
+            chat.messages.push({ id: crypto.randomUUID(), sender: 'user', text: messageText, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            const aiMessage = { id: crypto.randomUUID(), sender: 'ai', text: '', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), aiType: state.currentModel, isStreaming: true };
+            chat.messages.push(aiMessage);
+            if (chat.messages.length === 2 && chat.title === 'New Conversation') {
+                chat.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
+            }
+            D.messageInput.value = ''; D.messageInput.style.height = 'auto';
+            renderChatList();
+            renderMessages();
+            saveState();
+            state.abortController = new AbortController();
+            try {
+                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        ai: state.currentModel, 
+                        messages: chat.messages.slice(0, -1).map(m => ({ 
+                            role: m.sender === 'user' ? 'user' : 'assistant', 
+                            content: m.text 
+                        })) 
+                    }),
+                    signal: state.abortController.signal
+                });
+                console.log('API Response Status:', response.status);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                setChatStatus('streaming');
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                // Handle the response from our API
+                if (data.response) {
+                    aiMessage.text = data.response;
+                    aiMessage.isStreaming = false;
+                    renderMessages();
+                } else {
+                    throw new Error('No response from API');
+                }
+                
+            } catch (error) {
+                console.error('Error in sendMessage:', error);
+                if (error.name === 'AbortError') { 
+                    aiMessage.text += "\n\n*Generation stopped by user.*"; 
+                } else {
+                    aiMessage.text = `Sorry, I encountered an error: ${error.message}`;
+                    aiMessage.isError = true;
+                }
+            } finally {
+                aiMessage.isStreaming = false;
+                setChatStatus('idle');
+                renderMessages();
+                saveState();
+            }
+        }
+        function renderMessages() {
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat || chat.messages.length === 0) { 
+                D.welcomeScreen.classList.remove('hidden'); 
+                D.messagesContainer.classList.add('hidden'); 
+                return; 
+            }
+            D.welcomeScreen.classList.add('hidden'); 
+            D.messagesContainer.classList.remove('hidden');
+            
+            D.messagesContainer.innerHTML = chat.messages.map((msg, index) => {
+                const config = MODEL_CONFIGS[msg.aiType || 'grok'];
+                const senderIcon = msg.sender === 'user' ? 
+                    `<div class="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-bold">U</div>` : 
+                    `<div class="w-8 h-8 rounded-full bg-gradient-to-r ${config.color} flex-shrink-0 flex items-center justify-center text-white font-bold">${config.icon}</div>`;
+                
+                let content = '';
+                if (msg.isStreaming) {
+                    content = `<div class="thinking-indicator"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div>`;
+                } else {
+                    content = processMessageText(msg.text);
+                }
+                
+                const messageBubble = `
+                    <div class="message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'} ${msg.isError ? 'error-message' : ''}">
+                        <div class="message-content">${content}</div>
+                        ${!msg.isStreaming ? `<div class="flex items-center justify-between mt-2"><span class="text-xs opacity-70">${msg.timestamp}</span><div class="flex gap-1">${msg.sender === 'ai' ? `<button onclick="regenerateResponse(${index})" class="p-1 hover:bg-accent rounded transition-colors" title="Regenerate"><i data-lucide="refresh-cw" class="h-3 w-3"></i></button>` : ''}<button onclick="copyMessage('${escapeHtml(msg.text)}')" class="p-1 hover:bg-accent rounded transition-colors" title="Copy"><i data-lucide="copy" class="h-3 w-3"></i></button></div></div>` : ''}
+                    </div>`;
+                    
+                return `<div id="message-${msg.id}" class="flex gap-3 fade-in ${msg.sender === 'user' ? 'justify-end' : ''}">${msg.sender === 'user' ? messageBubble + senderIcon : senderIcon + messageBubble}</div>`;
+            }).join('');
+            
+            lucide.createIcons();
+            if(!chat.messages[chat.messages.length - 1].isStreaming) scrollToBottom(D.chatContainer);
+        }
+        function renderChatList(searchQuery = '') { 
+            const filtered = state.chats.filter(c => c.title.toLowerCase().includes(searchQuery)); 
+            if (filtered.length === 0) { 
+                D.chatList.innerHTML = `<div class="text-center text-muted-foreground py-4 text-sm">No chats found</div>`; 
+                return; 
+            } 
+            D.chatList.innerHTML = filtered.map(chat => { 
+                const config = MODEL_CONFIGS[chat.model]; 
+                return `<div class="chat-item ${state.selectedChatId === chat.id ? 'active' : ''}" onclick="selectChat('${chat.id}')"><div class="chat-item-icon bg-gradient-to-r ${config.color} text-white">${config.icon}</div><div class="flex-1 min-w-0"><h3 class="font-medium truncate">${escapeHtml(chat.title)}</h3><p class="text-xs text-muted-foreground">${chat.date}</p></div><button onclick="deleteChat(event, '${chat.id}')" class="p-1 opacity-50 hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground rounded transition-colors"><i data-lucide="trash-2" class="h-3 w-3"></i></button></div>`; 
+            }).join(''); 
+            lucide.createIcons(); 
+        }
+        function createNewChat(select = true) { 
+            const chat = { 
+                id: crypto.randomUUID(), 
+                title: 'New Conversation', 
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), 
+                model: state.currentModel, 
+                messages: [] 
+            }; 
+            state.chats.unshift(chat); 
+            if (select) selectChat(chat.id); 
+            return chat.id; 
+        }
+        function selectChat(id) { 
+            if (!id && state.chats.length > 0) id = state.chats[0].id; 
+            if (!id) return; 
+            state.selectedChatId = id; 
+            const chat = state.chats.find(c => c.id === id); 
+            if (chat) { 
+                state.currentModel = chat.model; 
+                renderMessages(); 
+            } 
+            renderChatList(); 
+            saveState(); 
+            if (window.innerWidth <= 768 && D.sidebar.classList.contains('open')) { 
+                toggleSidebar(); 
+            } 
+        }
+        function deleteChat(e, id) { 
+            e.stopPropagation(); 
+            if (!confirm('Delete this conversation?')) return; 
+            state.chats = state.chats.filter(c => c.id !== id); 
+            if (state.selectedChatId === id) { 
+                selectChat(state.chats[0]?.id); 
+            } else { 
+                renderChatList(); 
+            } 
+            saveState(); 
+            showToast('Chat deleted', 'success'); 
+        }
+        function clearChat() { 
+            if (!state.selectedChatId || !confirm('Clear all messages in this conversation?')) return; 
+            const chat = state.chats.find(c => c.id === state.selectedChatId); 
+            if (chat) { 
+                chat.messages = []; 
+                renderMessages(); 
+                saveState(); 
+                showToast('Conversation cleared', 'success'); 
+            } 
+        }
+        async function regenerateResponse(index) { 
+            if (state.chatStatus !== 'idle') return; 
+            const chat = state.chats.find(c => c.id === state.selectedChatId); 
+            if (!chat || index < 1 || chat.messages[index-1]?.sender !== 'user') return; 
+            D.messageInput.value = chat.messages[index-1].text; 
+            chat.messages.splice(index-1); 
+            await sendMessage(); 
+        }
+        function selectModel(model) { 
+            state.currentModel = model; 
+            const chat = state.chats.find(c => c.id === state.selectedChatId); 
+            if (chat) chat.model = model; 
+            D.modelModal.classList.add('hidden'); 
+            saveState(); 
+            showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info'); 
+        }
+        function openSettingsModal() { 
+            document.getElementById('darkModeToggle').checked = state.settings.darkMode; 
+            document.getElementById('typingToggle').checked = state.settings.typingAnimation; 
+            setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn'); 
+            setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn'); 
+            D.settingsModal.classList.remove('hidden'); 
+        }
+        function saveSettings() { 
+            state.settings.darkMode = document.getElementById('darkModeToggle').checked; 
+            state.settings.typingAnimation = document.getElementById('typingToggle').checked; 
+            state.settings.fontSize = document.querySelector('.fontSizeBtn.active').dataset.size; 
+            state.settings.typingSpeed = document.querySelector('.typingSpeedBtn.active').dataset.speed; 
+            applySettings(); 
+            saveState(); 
+            D.settingsModal.classList.add('hidden'); 
+            showToast('Settings saved!', 'success'); 
+        }
+        function resetSettings() { 
+            state.settings = { ...defaultSettings }; 
+            openSettingsModal(); 
+        }
+        function applySettings() { 
+            D.html.classList.toggle('dark', state.settings.darkMode); 
+            const sizeMap = { 
+                small: 'var(--font-size-sm)', 
+                medium: 'var(--font-size-base)', 
+                large: 'var(--font-size-lg)' 
+            }; 
+            D.html.style.fontSize = sizeMap[state.settings.fontSize]; 
+        }
+        function saveState() { 
+            localStorage.setItem('ajstudioz_chats', JSON.stringify(state.chats)); 
+            localStorage.setItem('ajstudioz_settings', JSON.stringify(state.settings)); 
+            localStorage.setItem('ajstudioz_lastChatId', state.selectedChatId); 
+        }
+        function loadState() { 
+            const chats = localStorage.getItem('ajstudioz_chats'); 
+            const settings = localStorage.getItem('ajstudioz_settings'); 
+            const lastChatId = localStorage.getItem('ajstudioz_lastChatId'); 
+            if (chats) state.chats = JSON.parse(chats); 
+            if (settings) state.settings = { ...defaultSettings, ...JSON.parse(settings) }; 
+            if (lastChatId) state.selectedChatId = lastChatId; 
+        }
+        function setChatStatus(status) { 
+            state.chatStatus = status; 
+            if (status === 'waiting' || status === 'streaming') { 
+                D.messageInput.disabled = true; 
+                D.messageInput.placeholder = 'AI is responding...'; 
+                if (status === 'streaming') { 
+                    D.sendBtn.innerHTML = `<i data-lucide="square" class="h-4 w-4"></i>`; 
+                    D.sendBtn.onclick = () => state.abortController?.abort(); 
+                    D.sendBtn.title = "Stop Generating"; 
+                } else { 
+                    D.sendBtn.innerHTML = `<div class="spinner"></div>`; 
+                    D.sendBtn.onclick = null; 
+                } 
+                D.sendBtn.disabled = false; 
+            } else { 
+                D.sendBtn.disabled = false; 
+                D.sendBtn.innerHTML = `<i data-lucide="send" class="h-4 w-4"></i>`; 
+                D.sendBtn.onclick = sendMessage; 
+                D.sendBtn.title = "Send Message"; 
+                D.messageInput.disabled = false; 
+                D.messageInput.placeholder = 'Message AJ...'; 
+            } 
+            lucide.createIcons(); 
+        }
+        function toggleSidebar() { 
+            D.sidebar.classList.toggle('open'); 
+            D.sidebarOverlay.classList.toggle('show'); 
+        }
+        function handleInputKeydown(e) { 
+            if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault(); 
+                sendMessage(); 
+            } 
+        }
+        function setActiveButton(target, selector) { 
+            document.querySelectorAll(selector).forEach(btn => { 
+                btn.classList.remove('active', 'bg-primary', 'text-primary-foreground'); 
+                btn.classList.add('bg-secondary', 'text-secondary-foreground'); 
+            }); 
+            target.classList.add('active', 'bg-primary', 'text-primary-foreground'); 
+            target.classList.remove('bg-secondary', 'text-secondary-foreground'); 
+        }
+        function showToast(message, type = 'info') { 
+            const toastContainer = document.getElementById('toastContainer'); 
+            const toast = document.createElement('div'); 
+            const colors = { 
+                success: 'bg-green-500', 
+                error: 'bg-red-500', 
+                info: 'bg-blue-500' 
+            }; 
+            toast.className = `toast ${colors[type]} text-white`; 
+            toast.style.cssText = 'background-color:rgb(var(--card));color:rgb(var(--foreground));border:1px solid hsl(var(--border));border-radius:0.5rem;padding:0.75rem 1rem;box-shadow:0 4px 12px rgba(0, 0, 0, 0.05);margin-bottom:0.5rem;animation:slideIn 0.3s ease-out;'; 
+            toast.textContent = message; 
+            toastContainer.appendChild(toast); 
+            setTimeout(() => { 
+                toast.style.opacity = '0'; 
+                setTimeout(() => toastContainer.removeChild(toast), 300); 
+            }, 3000); 
+        }
+        function processMessageText(text) {
+            if (!text) return '';
+            let html = escapeHtml(text).replace(/\n/g, '<br>');
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                       .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/```(\w*)\s*<br>([\s\S]*?)<br>```/g, (_, lang, code) => {
+                const language = lang || 'text';
+                const decodedCode = code.replace(/<br>/g, '\n');
+                return `</div><div class="code-block" data-code="${escapeHtml(decodedCode)}">
+                    <div class="code-header">
+                        <span>${language}</span>
+                        <button onclick="copyCode(this)">
+                            <i data-lucide="copy" class="h-3 w-3"></i>Copy
+                        </button>
+                    </div>
+                    <div class="code-content">
+                        <pre><code>${decodedCode}</code></pre>
+                    </div>
+                </div><div class="message-content">`;
+            });
+            html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+            html = html.replace(/^\s*[-*]\s+(.*)$/gm, '<ul><li>$1</li></ul>')
+                       .replace(/<\/ul><br><ul>/g, '');
+            html = html.replace(/^\s*\d+\.\s+(.*)$/gm, '<ol><li>$1</li></ol>')
+                       .replace(/<\/ol><br><ol>/g, '');
+            return html;
+        }
+        function isScrolledToBottom(el) { 
+            return el.scrollHeight - el.scrollTop - el.clientHeight < 50; 
+        }
+        function scrollToBottom(el, behavior = 'smooth') { 
+            el.scrollTo({ top: el.scrollHeight, behavior: behavior }); 
+        }
+        function escapeHtml(text) { 
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
+        }
+        function copyMessage(text) { 
+            navigator.clipboard.writeText(text).then(() => showToast('Message copied!', 'success')); 
+        }
+        function copyCode(btn) { 
+            const code = btn.closest('.code-block').dataset.code; 
+            navigator.clipboard.writeText(code).then(() => showToast('Code copied!', 'success')); 
+        }
+    </script>
+</body>
+</html>
