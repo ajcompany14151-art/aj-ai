@@ -45,6 +45,13 @@ const MODEL_CONFIGS = {
         color: 'from-purple-500 to-pink-600',
         icon: 'AJ',
         endpoint: '/api/chat'
+    },
+    zai: {
+        name: 'AJ-ZAI',
+        apiModel: 'z-ai-sdk',
+        color: 'from-green-500 to-teal-600',
+        icon: 'Z',
+        endpoint: '/api/chat'
     }
 };
 
