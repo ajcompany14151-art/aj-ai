@@ -45,7 +45,7 @@
         .code-header{background:linear-gradient(135deg, #334155 0%, #1e293b 100%);padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;font-family:'Roboto Mono', monospace;font-weight:500;color:#e2e8f0;border-bottom:1px solid rgba(148, 163, 184, 0.2);}
         .code-header button{background:linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);border:1px solid rgba(99, 102, 241, 0.3);border-radius:0.5rem;padding:0.25rem 0.75rem;color:#e2e8f0;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;gap:0.25rem;transition:all 0.3s ease;font-family:'Roboto Mono', monospace;font-weight:500;}
         .code-header button:hover{background:linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);border-color:rgba(99, 102, 241, 0.5);color:white;transform:translateY(-1px);box-shadow:0 4px 12px rgba(99, 102, 241, 0.3);}
-        .code-content{padding:1rem;overflow-x-auto;background:rgba(15, 23, 42, 0.5);}
+        .code-content{padding:1rem;overflow-x:auto;background:rgba(15, 23, 42, 0.5);}
         .code-content pre{margin:0;font-family:'Roboto Mono', monospace;font-size:0.875rem;line-height:1.5;color:#e2e8f0;}
         .typing-cursor{display:inline-block;width:3px;height:1.2em;background-color:rgb(var(--foreground));animation:blink 1s infinite;vertical-align:text-bottom;margin-left:2px;}@keyframes blink{0%, 50%{opacity:1;}51%, 100%{opacity:0;}}
         .hidden { display: none !important; }
@@ -114,7 +114,7 @@
         .floating-btn { position: fixed; bottom: 2rem; right: 2rem; z-index: 30; }
         .example-prompt { transition: all 0.2s ease; }
         .example-prompt:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .input-action-btn { width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content-center; background: none; border: none; color: rgb(var(--muted-foreground)); cursor: pointer; transition: all 0.2s ease; }
+        .input-action-btn { width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; background: none; border: none; color: rgb(var(--muted-foreground)); cursor: pointer; transition: all 0.2s ease; }
         .input-action-btn:hover { background-color: rgb(var(--accent)); color: rgb(var(--foreground)); }
         .error-message { background-color: rgb(var(--destructive)); color: rgb(var(--destructive-foreground)); }
         .active { background-color: rgb(var(--primary)); color: rgb(var(--primary-foreground)); }
@@ -124,13 +124,233 @@
         .model-radio { transition: all 0.3s ease; cursor: pointer; }
         .model-option-btn { transition: all 0.3s ease; cursor: pointer; }
         .model-option-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        
+        /* Copilot-like UI improvements */
+        .dark .ai-message {
+            background: linear-gradient(135deg, rgba(52, 53, 65, 0.8) 0%, rgba(52, 53, 65, 0.6) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dark .user-message {
+            background: linear-gradient(135deg, rgba(65, 105, 225, 0.9) 0%, rgba(65, 105, 225, 0.7) 100%);
+            border: 1px solid rgba(65, 105, 225, 0.3);
+        }
+        
+        .typing-text {
+            display: inline;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: rgb(var(--foreground));
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+            margin-left: 1px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Advanced features styles */
+        .model-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        .model-badge-grok {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: rgb(59, 130, 246);
+        }
+        
+        .model-badge-gemini {
+            background-color: rgba(168, 85, 247, 0.2);
+            color: rgb(168, 85, 247);
+        }
+        
+        .model-badge-zai {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: rgb(16, 185, 129);
+        }
+        
+        .dark .model-badge-grok {
+            background-color: rgba(59, 130, 246, 0.3);
+            color: rgb(129, 140, 248);
+        }
+        
+        .dark .model-badge-gemini {
+            background-color: rgba(168, 85, 247, 0.3);
+            color: rgb(192, 132, 252);
+        }
+        
+        .dark .model-badge-zai {
+            background-color: rgba(16, 185, 129, 0.3);
+            color: rgb(52, 211, 153);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .quick-action-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            background-color: rgba(99, 102, 241, 0.1);
+            color: rgb(99, 102, 241);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-action-btn:hover {
+            background-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .dark .quick-action-btn {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: rgb(129, 140, 248);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        .dark .quick-action-btn:hover {
+            background-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .web-search-result {
+            background-color: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .web-search-result-title {
+            font-weight: 500;
+            color: rgb(99, 102, 241);
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .web-search-result-url {
+            font-size: 0.75rem;
+            color: rgb(100, 116, 139);
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .web-search-result-snippet {
+            font-size: 0.875rem;
+            color: rgb(var(--foreground));
+        }
+        
+        .dark .web-search-result {
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .dark .web-search-result-title {
+            color: rgb(129, 140, 248);
+        }
+        
+        .dark .web-search-result-url {
+            color: rgb(148, 163, 184);
+        }
+        
+        .image-container {
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .image-caption {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            color: rgb(var(--muted-foreground));
+            text-align: center;
+            background-color: rgba(var(--muted), 0.5);
+        }
+        
+        .dark .image-caption {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+        
+        .feature-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background-color: rgba(var(--muted), 0.5);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dark .feature-toggle {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+        
+        .feature-toggle-label {
+            font-weight: 500;
+        }
+        
+        .feature-toggle-description {
+            font-size: 0.875rem;
+            color: rgb(var(--muted-foreground));
+        }
+        
+        .voice-recording {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: rgb(239, 68, 68);
+            margin-bottom: 1rem;
+        }
+        
+        .voice-recording-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgb(239, 68, 68);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="font-sans">
     <div id="app">
         <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
         <div id="sidebar" class="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header p-4 border-b border-border">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">AJ</div>
                     <div>
@@ -139,7 +359,7 @@
                     </div>
                 </div>
             </div>
-            <div class="sidebar-content">
+            <div class="sidebar-content flex-1 overflow-y-auto p-4">
                 <button id="newChatBtn" class="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 font-medium mb-4">
                     <i data-lucide="plus" class="h-4 w-4"></i>New Chat
                 </button>
@@ -152,7 +372,7 @@
                     <div id="chatList" class="space-y-1"></div>
                 </div>
             </div>
-            <div class="sidebar-footer">
+            <div class="sidebar-footer p-4 border-t border-border">
                 <div class="ai-info-card" style="background-color:rgb(var(--muted));border-radius:0.75rem;padding:1rem;margin-bottom:1rem;border:1px solid hsl(var(--border));">
                     <div class="flex items-center gap-3 mb-2">
                         <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">AJ</div>
@@ -266,6 +486,13 @@
                 </div>
             </div>
             <div class="input-area">
+                <div id="voiceRecording" class="voice-recording hidden">
+                    <div class="voice-recording-indicator"></div>
+                    <span>Listening...</span>
+                    <button id="stopVoiceBtn" class="p-1 hover:bg-red-100 rounded-full">
+                        <i data-lucide="square" class="h-4 w-4"></i>
+                    </button>
+                </div>
                 <div class="input-wrapper">
                     <textarea id="messageInput" placeholder="Message AJ..." class="w-full p-3 pr-20 resize-none focus:outline-none focus:ring-2 focus:ring-ring min-h-[52px] max-h-48"></textarea>
                     <div class="input-actions">
@@ -310,7 +537,7 @@
                         <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="grok">
                             <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
                             <div class="flex-1">
-                                <div class="font-medium">AJ-Fast</div>
+                                <div class="font-medium">AJ-Fast (Groq)</div>
                                 <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
                             </div>
                             <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="grok"></div>
@@ -318,16 +545,60 @@
                         <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="gemini">
                             <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
                             <div class="flex-1">
-                                <div class="font-medium">AJ-Creative</div>
+                                <div class="font-medium">AJ-Creative (Gemini)</div>
                                 <div class="text-sm text-muted-foreground">Enhanced creativity and reasoning</div>
                             </div>
                             <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="gemini"></div>
                         </button>
+                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="zai">
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                            <div class="flex-1">
+                                <div class="font-medium">AJ-Advanced (Z-AI)</div>
+                                <div class="text-sm text-muted-foreground">Advanced capabilities with web search</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="zai"></div>
+                        </button>
                     </div>
                 </div>
-
                 <div class="border-t border-border pt-6"></div>
-
+                <!-- Advanced Features -->
+                <div class="space-y-6">
+                    <h4 class="font-medium text-lg">Advanced Features</h4>
+                    
+                    <div class="feature-toggle">
+                        <div>
+                            <div class="feature-toggle-label">Web Search</div>
+                            <div class="feature-toggle-description">Enable AI to search the web for current information</div>
+                        </div>
+                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                            <input type="checkbox" id="webSearchToggle">
+                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-toggle">
+                        <div>
+                            <div class="feature-toggle-label">Image Generation</div>
+                            <div class="feature-toggle-description">Allow AI to generate images based on descriptions</div>
+                        </div>
+                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                            <input type="checkbox" id="imageGenToggle">
+                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-toggle">
+                        <div>
+                            <div class="feature-toggle-label">Voice Input</div>
+                            <div class="feature-toggle-description">Use your voice to send messages</div>
+                        </div>
+                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                            <input type="checkbox" id="voiceInputToggle">
+                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="border-t border-border pt-6"></div>
                 <!-- Appearance Settings -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Appearance</h4>
@@ -348,9 +619,7 @@
                         </label>
                     </div>
                 </div>
-
                 <div class="border-t border-border pt-6"></div>
-
                 <!-- Text Settings -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Text Settings</h4>
@@ -383,40 +652,109 @@
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50"></div>
     
     <script>
-        // --- FINALIZED SCRIPT WITH MODEL & TYPING FIX ---
-        const defaultSettings = { darkMode: false, typingAnimation: true, fontSize: 'medium', typingSpeed: 'medium' };
-        let state = { chats: [], selectedChatId: null, currentModel: 'grok', chatStatus: 'idle', abortController: null, settings: { ...defaultSettings } };
+        // --- FINALIZED SCRIPT WITH THREE AI MODELS & ADVANCED FEATURES ---
+        const defaultSettings = { 
+            darkMode: false, 
+            typingAnimation: true, 
+            fontSize: 'medium', 
+            typingSpeed: 'medium',
+            webSearch: false,
+            imageGeneration: false,
+            voiceInput: false
+        };
+        let state = { 
+            chats: [], 
+            selectedChatId: null, 
+            currentModel: 'grok', 
+            chatStatus: 'idle', 
+            abortController: null, 
+            settings: { ...defaultSettings },
+            typingIntervals: {}, // Store typing intervals for cleanup
+            voiceRecognition: null,
+            isRecording: false
+        };
         const TYPING_SPEEDS = { slow: 40, medium: 20, fast: 5 };
         const MODEL_CONFIGS = {
-            grok: { name: 'AJ-Fast', apiModel: 'llama3-8b-8192', color: 'from-blue-500 to-purple-600', icon: 'AJ', endpoint: '/api/chat' },
-            gemini: { name: 'AJ-Creative', apiModel: 'gemini-1.5-flash', color: 'from-purple-500 to-pink-600', icon: 'AJ', endpoint: '/api/chat' }
+            grok: { 
+                name: 'AJ-Fast (Groq)', 
+                apiModel: 'llama3-8b-8192', 
+                color: 'from-blue-500 to-purple-600', 
+                icon: 'AJ', 
+                endpoint: '/api/chat',
+                badgeClass: 'model-badge-grok'
+            },
+            gemini: { 
+                name: 'AJ-Creative (Gemini)', 
+                apiModel: 'gemini-1.5-flash', 
+                color: 'from-purple-500 to-pink-600', 
+                icon: 'AJ', 
+                endpoint: '/api/chat',
+                badgeClass: 'model-badge-gemini'
+            },
+            zai: { 
+                name: 'AJ-Advanced (Z-AI)', 
+                apiModel: 'z-ai-advanced', 
+                color: 'from-green-500 to-teal-600', 
+                icon: 'AJ', 
+                endpoint: '/api/chat',
+                badgeClass: 'model-badge-zai'
+            }
         };
-        const D = { html: document.documentElement, chatContainer: document.getElementById('chatContainer'), welcomeScreen: document.getElementById('welcomeScreen'), messagesContainer: document.getElementById('messagesContainer'), messageInput: document.getElementById('messageInput'), sendBtn: document.getElementById('sendBtn'), chatList: document.getElementById('chatList'), settingsModal: document.getElementById('settingsModal'), sidebar: document.getElementById('sidebar'), sidebarOverlay: document.getElementById('sidebarOverlay') };
+        const D = { 
+            html: document.documentElement, 
+            chatContainer: document.getElementById('chatContainer'), 
+            welcomeScreen: document.getElementById('welcomeScreen'), 
+            messagesContainer: document.getElementById('messagesContainer'), 
+            messageInput: document.getElementById('messageInput'), 
+            sendBtn: document.getElementById('sendBtn'), 
+            chatList: document.getElementById('chatList'), 
+            settingsModal: document.getElementById('settingsModal'), 
+            sidebar: document.getElementById('sidebar'), 
+            sidebarOverlay: document.getElementById('sidebarOverlay'),
+            voiceRecording: document.getElementById('voiceRecording'),
+            voiceBtn: document.getElementById('voiceBtn'),
+            stopVoiceBtn: document.getElementById('stopVoiceBtn')
+        };
+        
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             loadState();
             applySettings();
             initializeEventListeners();
+            initializeVoiceRecognition();
             selectChat(state.selectedChatId || state.chats[0]?.id || createNewChat(false));
         });
+        
         function initializeEventListeners() {
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleSidebar);
             document.getElementById('newChatBtn').addEventListener('click', () => createNewChat(true));
             document.getElementById('clearBtn').addEventListener('click', clearChat);
-            document.getElementById('exportBtn').addEventListener('click', () => showToast('Export feature coming soon!', 'info'));
+            document.getElementById('exportBtn').addEventListener('click', exportChat);
             document.getElementById('attachBtn').addEventListener('click', () => showToast('File attachments coming soon!', 'info'));
-            document.getElementById('voiceBtn').addEventListener('click', () => showToast('Voice input coming soon!', 'info'));
             document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
             document.getElementById('closeSettingsBtn').addEventListener('click', () => D.settingsModal.classList.add('hidden'));
             document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
             document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+            
             D.messageInput.addEventListener('keydown', handleInputKeydown);
-            D.messageInput.addEventListener('input', () => { D.messageInput.style.height = 'auto'; D.messageInput.style.height = `${D.messageInput.scrollHeight}px`; });
+            D.messageInput.addEventListener('input', () => { 
+                D.messageInput.style.height = 'auto'; 
+                D.messageInput.style.height = `${D.messageInput.scrollHeight}px`; 
+            });
             D.messageInput.addEventListener('focus', () => D.chatContainer.classList.add('keyboard-open'));
             D.messageInput.addEventListener('blur', () => D.chatContainer.classList.remove('keyboard-open'));
             D.sendBtn.addEventListener('click', sendMessage);
+            
+            // Voice input event listeners
+            D.voiceBtn.addEventListener('click', toggleVoiceRecording);
+            D.stopVoiceBtn.addEventListener('click', stopVoiceRecording);
+            
             document.getElementById('searchInput').addEventListener('input', (e) => renderChatList(e.target.value.toLowerCase()));
-            document.querySelectorAll('.example-prompt').forEach(el => el.addEventListener('click', (e) => { D.messageInput.value = e.currentTarget.dataset.prompt; sendMessage(); }));
+            document.querySelectorAll('.example-prompt').forEach(el => el.addEventListener('click', (e) => { 
+                D.messageInput.value = e.currentTarget.dataset.prompt; 
+                sendMessage(); 
+            }));
+            
             document.querySelectorAll('.fontSizeBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.fontSizeBtn')));
             document.querySelectorAll('.typingSpeedBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.typingSpeedBtn')));
             
@@ -428,36 +766,226 @@
                 });
             });
         }
+        
+        // Initialize voice recognition
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                state.voiceRecognition = new SpeechRecognition();
+                state.voiceRecognition.continuous = false;
+                state.voiceRecognition.interimResults = true;
+                state.voiceRecognition.lang = 'en-US';
+                
+                state.voiceRecognition.onresult = (event) => {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0])
+                        .map(result => result.transcript)
+                        .join('');
+                    
+                    D.messageInput.value = transcript;
+                };
+                
+                state.voiceRecognition.onerror = (event) => {
+                    console.error('Speech recognition error', event.error);
+                    showToast(`Voice recognition error: ${event.error}`, 'error');
+                    stopVoiceRecording();
+                };
+                
+                state.voiceRecognition.onend = () => {
+                    if (state.isRecording) {
+                        stopVoiceRecording();
+                        // Auto-send message if there's text
+                        if (D.messageInput.value.trim()) {
+                            sendMessage();
+                        }
+                    }
+                };
+            } else {
+                // Voice recognition not supported
+                state.settings.voiceInput = false;
+                D.voiceBtn.style.display = 'none';
+            }
+        }
+        
+        // Toggle voice recording
+        function toggleVoiceRecording() {
+            if (!state.settings.voiceInput) {
+                showToast('Voice input is disabled in settings', 'info');
+                return;
+            }
+            
+            if (state.isRecording) {
+                stopVoiceRecording();
+            } else {
+                startVoiceRecording();
+            }
+        }
+        
+        // Start voice recording
+        function startVoiceRecording() {
+            if (!state.voiceRecognition) {
+                showToast('Voice recognition not supported in your browser', 'error');
+                return;
+            }
+            
+            state.isRecording = true;
+            D.voiceRecording.classList.remove('hidden');
+            D.voiceBtn.innerHTML = '<i data-lucide="mic-off" class="h-4 w-4"></i>';
+            D.messageInput.value = '';
+            
+            try {
+                state.voiceRecognition.start();
+            } catch (error) {
+                console.error('Error starting voice recognition:', error);
+                showToast('Error starting voice recognition', 'error');
+                stopVoiceRecording();
+            }
+            
+            lucide.createIcons();
+        }
+        
+        // Stop voice recording
+        function stopVoiceRecording() {
+            state.isRecording = false;
+            D.voiceRecording.classList.add('hidden');
+            D.voiceBtn.innerHTML = '<i data-lucide="mic" class="h-4 w-4"></i>';
+            
+            if (state.voiceRecognition) {
+                try {
+                    state.voiceRecognition.stop();
+                } catch (error) {
+                    // Already stopped or not started
+                    console.log('Voice recognition already stopped');
+                }
+            }
+            
+            lucide.createIcons();
+        }
+        
+        // Export chat function
+        function exportChat() {
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat || chat.messages.length === 0) {
+                showToast('No messages to export', 'info');
+                return;
+            }
+            
+            let exportText = `AI Assistant Chat - ${chat.title}\n`;
+            exportText += `Date: ${new Date().toLocaleString()}\n`;
+            exportText += `Model: ${MODEL_CONFIGS[chat.model].name}\n\n`;
+            
+            chat.messages.forEach(msg => {
+                const sender = msg.sender === 'user' ? 'You' : 'AI Assistant';
+                exportText += `${sender} (${msg.timestamp}):\n${msg.text}\n\n`;
+            });
+            
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-assistant-chat-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Chat exported successfully', 'success');
+        }
+        
         async function sendMessage() {
             const messageText = D.messageInput.value.trim();
             if (!messageText || !state.selectedChatId || state.chatStatus !== 'idle') return;
+            
             const chat = state.chats.find(c => c.id === state.selectedChatId);
             if (!chat) return;
+            
             setChatStatus('waiting');
-            chat.messages.push({ id: crypto.randomUUID(), sender: 'user', text: messageText, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-            const aiMessage = { id: crypto.randomUUID(), sender: 'ai', text: '', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), aiType: state.currentModel, isStreaming: true };
+            chat.messages.push({ 
+                id: crypto.randomUUID(), 
+                sender: 'user', 
+                text: messageText, 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            });
+            
+            const aiMessage = { 
+                id: crypto.randomUUID(), 
+                sender: 'ai', 
+                text: '', 
+                fullText: '', // Store the complete response
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                aiType: state.currentModel, 
+                isTyping: true, // Flag to indicate typing is in progress
+                webResults: [], // Store web search results if any
+                images: [] // Store generated images if any
+            };
+            
             chat.messages.push(aiMessage);
+            
             if (chat.messages.length === 2 && chat.title === 'New Conversation') {
                 chat.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : '');
             }
-            D.messageInput.value = ''; D.messageInput.style.height = 'auto';
+            
+            D.messageInput.value = ''; 
+            D.messageInput.style.height = 'auto';
             renderChatList();
             renderMessages();
             saveState();
+            
             state.abortController = new AbortController();
+            
             try {
+                // Check if we need to perform web search
+                let enhancedMessages = [...chat.messages.slice(0, -1).map(m => ({ 
+                    role: m.sender === 'user' ? 'user' : 'assistant', 
+                    content: m.text 
+                }))];
+                
+                // If web search is enabled and the query might need current information
+                if (state.settings.webSearch && state.currentModel === 'zai') {
+                    const webSearchQuery = extractWebSearchQuery(messageText);
+                    if (webSearchQuery) {
+                        try {
+                            const webResults = await performWebSearch(webSearchQuery);
+                            if (webResults && webResults.length > 0) {
+                                aiMessage.webResults = webResults;
+                                
+                                // Add web search context to the message
+                                enhancedMessages[enhancedMessages.length - 1].content += `\n\nWeb search results for context:\n${webResults.map(r => `- ${r.title}: ${r.snippet}`).join('\n')}`;
+                            }
+                        } catch (error) {
+                            console.error('Web search error:', error);
+                        }
+                    }
+                }
+                
+                // Check if we need to generate an image
+                if (state.settings.imageGeneration && containsImageGenerationRequest(messageText)) {
+                    try {
+                        const imagePrompt = extractImagePrompt(messageText);
+                        if (imagePrompt) {
+                            const imageData = await generateImage(imagePrompt);
+                            if (imageData) {
+                                aiMessage.images.push({
+                                    prompt: imagePrompt,
+                                    data: imageData
+                                });
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Image generation error:', error);
+                    }
+                }
+                
                 const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         ai: state.currentModel, 
-                        messages: chat.messages.slice(0, -1).map(m => ({ 
-                            role: m.sender === 'user' ? 'user' : 'assistant', 
-                            content: m.text 
-                        })) 
+                        messages: enhancedMessages
                     }),
                     signal: state.abortController.signal
                 });
+                
                 console.log('API Response Status:', response.status);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 
@@ -467,9 +995,17 @@
                 
                 // Handle the response from our API
                 if (data.response) {
-                    aiMessage.text = data.response;
-                    aiMessage.isStreaming = false;
-                    renderMessages();
+                    aiMessage.fullText = data.response;
+                    
+                    // Start typing effect if enabled
+                    if (state.settings.typingAnimation) {
+                        startTypingEffect(aiMessage.id, aiMessage.fullText);
+                    } else {
+                        // If typing animation is disabled, show the full text immediately
+                        aiMessage.text = aiMessage.fullText;
+                        aiMessage.isTyping = false;
+                        renderMessages();
+                    }
                 } else {
                     throw new Error('No response from API');
                 }
@@ -482,13 +1018,164 @@
                     aiMessage.text = `Sorry, I encountered an error: ${error.message}`;
                     aiMessage.isError = true;
                 }
-            } finally {
-                aiMessage.isStreaming = false;
-                setChatStatus('idle');
+                aiMessage.isTyping = false;
                 renderMessages();
+            } finally {
+                if (!aiMessage.isTyping) {
+                    setChatStatus('idle');
+                }
                 saveState();
             }
         }
+        
+        // Extract web search query from user message
+        function extractWebSearchQuery(message) {
+            const webSearchKeywords = [
+                'latest', 'recent', 'current', 'today', 'yesterday', 'news', 'update',
+                'what is happening', 'what happened', 'weather', 'stock price', 'score'
+            ];
+            
+            const lowerMessage = message.toLowerCase();
+            if (webSearchKeywords.some(keyword => lowerMessage.includes(keyword))) {
+                return message;
+            }
+            
+            // Check for questions about recent events
+            const recentEventPatterns = [
+                /what happened (today|yesterday|recently|lately)/i,
+                /latest (news|update|information) about/i,
+                /current (status|situation|price|value)/i
+            ];
+            
+            if (recentEventPatterns.some(pattern => pattern.test(message))) {
+                return message;
+            }
+            
+            return null;
+        }
+        
+        // Perform web search using Z-AI SDK
+        async function performWebSearch(query) {
+            try {
+                const ZAI = await import('z-ai-web-dev-sdk');
+                const zai = await ZAI.create();
+                
+                const searchResult = await zai.functions.invoke("web_search", {
+                    query: query,
+                    num: 5
+                });
+                
+                return searchResult;
+            } catch (error) {
+                console.error('Web search error:', error);
+                return null;
+            }
+        }
+        
+        // Check if message contains image generation request
+        function containsImageGenerationRequest(message) {
+            const imageKeywords = [
+                'generate', 'create', 'draw', 'make', 'show me', 'image of', 'picture of',
+                'visualize', 'illustration', 'art', 'design'
+            ];
+            
+            const lowerMessage = message.toLowerCase();
+            return imageKeywords.some(keyword => lowerMessage.includes(keyword));
+        }
+        
+        // Extract image prompt from user message
+        function extractImagePrompt(message) {
+            // Simple extraction - in a real app, this would be more sophisticated
+            const imagePromptPatterns = [
+                /generate (an? )?image of (.+)/i,
+                /create (an? )?(picture|image|art) of (.+)/i,
+                /draw (.+)/i,
+                /show me (an? )?image of (.+)/i
+            ];
+            
+            for (const pattern of imagePromptPatterns) {
+                const match = message.match(pattern);
+                if (match) {
+                    return match[2] || match[1];
+                }
+            }
+            
+            // If no pattern matches, use the whole message as the prompt
+            return message;
+        }
+        
+        // Generate image using Z-AI SDK
+        async function generateImage(prompt) {
+            try {
+                const ZAI = await import('z-ai-web-dev-sdk');
+                const zai = await ZAI.create();
+                
+                const response = await zai.images.generations.create({
+                    prompt: prompt,
+                    size: '1024x1024'
+                });
+                
+                return response.data[0].base64;
+            } catch (error) {
+                console.error('Image generation error:', error);
+                return null;
+            }
+        }
+        
+        // Function to start the typing effect
+        function startTypingEffect(messageId, fullText) {
+            // Clear any existing interval for this message
+            if (state.typingIntervals[messageId]) {
+                clearInterval(state.typingIntervals[messageId]);
+            }
+            
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat) return;
+            
+            const message = chat.messages.find(m => m.id === messageId);
+            if (!message) return;
+            
+            let index = 0;
+            const typingSpeed = TYPING_SPEEDS[state.settings.typingSpeed];
+            
+            // Update the message to show typing cursor
+            message.text = '';
+            renderMessages();
+            
+            // Set up the typing interval
+            state.typingIntervals[messageId] = setInterval(() => {
+                if (index < fullText.length) {
+                    // Add the next character
+                    message.text = fullText.substring(0, index + 1);
+                    index++;
+                    
+                    // Update the message in the DOM
+                    updateMessageText(messageId, message.text);
+                } else {
+                    // Typing is complete
+                    clearInterval(state.typingIntervals[messageId]);
+                    delete state.typingIntervals[messageId];
+                    
+                    message.isTyping = false;
+                    renderMessages();
+                    setChatStatus('idle');
+                    saveState();
+                }
+            }, typingSpeed);
+        }
+        
+        // Update a specific message's text without re-rendering the entire list
+        function updateMessageText(messageId, text) {
+            const messageElement = document.getElementById(`message-${messageId}`);
+            if (!messageElement) return;
+            
+            const contentElement = messageElement.querySelector('.message-content');
+            if (!contentElement) return;
+            
+            // Update the text content
+            contentElement.innerHTML = escapeHtml(text) + '<span class="cursor"></span>';
+        }
+        
         function renderMessages() {
             const chat = state.chats.find(c => c.id === state.selectedChatId);
             if (!chat || chat.messages.length === 0) { 
@@ -496,6 +1183,7 @@
                 D.messagesContainer.classList.add('hidden'); 
                 return; 
             }
+            
             D.welcomeScreen.classList.add('hidden'); 
             D.messagesContainer.classList.remove('hidden');
             
@@ -506,24 +1194,287 @@
                     `<div class="w-8 h-8 rounded-full bg-gradient-to-r ${config.color} flex-shrink-0 flex items-center justify-center text-white font-bold">${config.icon}</div>`;
                 
                 let content = '';
-                if (msg.isStreaming) {
-                    content = `<div class="thinking-indicator"><div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div></div>`;
+                if (msg.isTyping) {
+                    // Show the typing text with cursor
+                    content = `<div class="typing-text">${escapeHtml(msg.text)}<span class="cursor"></span></div>`;
                 } else {
-                    content = processMessageText(msg.text);
+                    // Show the fully formatted message
+                    content = processMessageText(msg.fullText || msg.text);
+                    
+                    // Add web search results if any
+                    if (msg.webResults && msg.webResults.length > 0) {
+                        content += '<div class="web-search-results">';
+                        content += '<h4 class="font-medium mb-2">Web Search Results:</h4>';
+                        msg.webResults.slice(0, 3).forEach(result => {
+                            content += `
+                                <div class="web-search-result">
+                                    <div class="web-search-result-title">${escapeHtml(result.name)}</div>
+                                    <div class="web-search-result-url">${escapeHtml(result.url)}</div>
+                                    <div class="web-search-result-snippet">${escapeHtml(result.snippet)}</div>
+                                </div>
+                            `;
+                        });
+                        content += '</div>';
+                    }
+                    
+                    // Add generated images if any
+                    if (msg.images && msg.images.length > 0) {
+                        msg.images.forEach(image => {
+                            content += `
+                                <div class="image-container">
+                                    <img src="data:image/png;base64,${image.data}" alt="${escapeHtml(image.prompt)}">
+                                    <div class="image-caption">Generated: ${escapeHtml(image.prompt)}</div>
+                                </div>
+                            `;
+                        });
+                    }
                 }
                 
                 const messageBubble = `
                     <div class="message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'} ${msg.isError ? 'error-message' : ''}">
                         <div class="message-content">${content}</div>
-                        ${!msg.isStreaming ? `<div class="flex items-center justify-between mt-2"><span class="text-xs opacity-70">${msg.timestamp}</span><div class="flex gap-1">${msg.sender === 'ai' ? `<button onclick="regenerateResponse(${index})" class="p-1 hover:bg-accent rounded transition-colors" title="Regenerate"><i data-lucide="refresh-cw" class="h-3 w-3"></i></button>` : ''}<button onclick="copyMessage('${escapeHtml(msg.text)}')" class="p-1 hover:bg-accent rounded transition-colors" title="Copy"><i data-lucide="copy" class="h-3 w-3"></i></button></div></div>` : ''}
+                        ${!msg.isTyping ? `
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs opacity-70">${msg.timestamp}</span>
+                                    ${msg.sender === 'ai' ? `<span class="model-badge ${config.badgeClass}">${config.name.split(' ')[0]}</span>` : ''}
+                                </div>
+                                <div class="flex gap-1">
+                                    ${msg.sender === 'ai' ? `<button onclick="regenerateResponse(${index})" class="p-1 hover:bg-accent rounded transition-colors" title="Regenerate"><i data-lucide="refresh-cw" class="h-3 w-3"></i></button>` : ''}
+                                    <button onclick="copyMessage('${escapeHtml(msg.fullText || msg.text)}')" class="p-1 hover:bg-accent rounded transition-colors" title="Copy"><i data-lucide="copy" class="h-3 w-3"></i></button>
+                                </div>
+                            </div>
+                            <div class="quick-actions">
+                                ${msg.sender === 'ai' ? `
+                                    <button onclick="summarizeResponse(${index})" class="quick-action-btn">Summarize</button>
+                                    <button onclick="explainResponse(${index})" class="quick-action-btn">Explain</button>
+                                    <button onclick="expandResponse(${index})" class="quick-action-btn">Expand</button>
+                                ` : ''}
+                            </div>
+                        ` : ''}
                     </div>`;
                     
                 return `<div id="message-${msg.id}" class="flex gap-3 fade-in ${msg.sender === 'user' ? 'justify-end' : ''}">${msg.sender === 'user' ? messageBubble + senderIcon : senderIcon + messageBubble}</div>`;
             }).join('');
             
             lucide.createIcons();
-            if(!chat.messages[chat.messages.length - 1].isStreaming) scrollToBottom(D.chatContainer);
+            if(!chat.messages[chat.messages.length - 1].isTyping) scrollToBottom(D.chatContainer);
         }
+        
+        // Quick action functions
+        async function summarizeResponse(index) {
+            if (state.chatStatus !== 'idle') return;
+            
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat || index < 0 || chat.messages[index]?.sender !== 'ai') return;
+            
+            const originalMessage = chat.messages[index];
+            const summaryPrompt = `Please summarize the following response in a concise way:\n\n${originalMessage.fullText || originalMessage.text}`;
+            
+            // Create a new message with the summary request
+            chat.messages.push({ 
+                id: crypto.randomUUID(), 
+                sender: 'user', 
+                text: "Summarize the previous response", 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            });
+            
+            const aiMessage = { 
+                id: crypto.randomUUID(), 
+                sender: 'ai', 
+                text: '', 
+                fullText: '', 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                aiType: state.currentModel, 
+                isTyping: true 
+            };
+            
+            chat.messages.push(aiMessage);
+            
+            renderMessages();
+            saveState();
+            
+            try {
+                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        ai: state.currentModel, 
+                        messages: [
+                            ...chat.messages.slice(0, -2).map(m => ({ 
+                                role: m.sender === 'user' ? 'user' : 'assistant', 
+                                content: m.text 
+                            })),
+                            { role: 'user', content: summaryPrompt }
+                        ]
+                    })
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.response) {
+                    aiMessage.fullText = data.response;
+                    
+                    if (state.settings.typingAnimation) {
+                        startTypingEffect(aiMessage.id, aiMessage.fullText);
+                    } else {
+                        aiMessage.text = aiMessage.fullText;
+                        aiMessage.isTyping = false;
+                        renderMessages();
+                    }
+                }
+            } catch (error) {
+                console.error('Error summarizing response:', error);
+                aiMessage.text = `Sorry, I couldn't summarize the response: ${error.message}`;
+                aiMessage.isTyping = false;
+                renderMessages();
+            }
+        }
+        
+        async function explainResponse(index) {
+            if (state.chatStatus !== 'idle') return;
+            
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat || index < 0 || chat.messages[index]?.sender !== 'ai') return;
+            
+            const originalMessage = chat.messages[index];
+            const explainPrompt = `Please explain the following response in simpler terms:\n\n${originalMessage.fullText || originalMessage.text}`;
+            
+            // Create a new message with the explanation request
+            chat.messages.push({ 
+                id: crypto.randomUUID(), 
+                sender: 'user', 
+                text: "Explain the previous response in simpler terms", 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            });
+            
+            const aiMessage = { 
+                id: crypto.randomUUID(), 
+                sender: 'ai', 
+                text: '', 
+                fullText: '', 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                aiType: state.currentModel, 
+                isTyping: true 
+            };
+            
+            chat.messages.push(aiMessage);
+            
+            renderMessages();
+            saveState();
+            
+            try {
+                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        ai: state.currentModel, 
+                        messages: [
+                            ...chat.messages.slice(0, -2).map(m => ({ 
+                                role: m.sender === 'user' ? 'user' : 'assistant', 
+                                content: m.text 
+                            })),
+                            { role: 'user', content: explainPrompt }
+                        ]
+                    })
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.response) {
+                    aiMessage.fullText = data.response;
+                    
+                    if (state.settings.typingAnimation) {
+                        startTypingEffect(aiMessage.id, aiMessage.fullText);
+                    } else {
+                        aiMessage.text = aiMessage.fullText;
+                        aiMessage.isTyping = false;
+                        renderMessages();
+                    }
+                }
+            } catch (error) {
+                console.error('Error explaining response:', error);
+                aiMessage.text = `Sorry, I couldn't explain the response: ${error.message}`;
+                aiMessage.isTyping = false;
+                renderMessages();
+            }
+        }
+        
+        async function expandResponse(index) {
+            if (state.chatStatus !== 'idle') return;
+            
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (!chat || index < 0 || chat.messages[index]?.sender !== 'ai') return;
+            
+            const originalMessage = chat.messages[index];
+            const expandPrompt = `Please provide more details and expand on the following response:\n\n${originalMessage.fullText || originalMessage.text}`;
+            
+            // Create a new message with the expansion request
+            chat.messages.push({ 
+                id: crypto.randomUUID(), 
+                sender: 'user', 
+                text: "Provide more details on the previous response", 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            });
+            
+            const aiMessage = { 
+                id: crypto.randomUUID(), 
+                sender: 'ai', 
+                text: '', 
+                fullText: '', 
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+                aiType: state.currentModel, 
+                isTyping: true 
+            };
+            
+            chat.messages.push(aiMessage);
+            
+            renderMessages();
+            saveState();
+            
+            try {
+                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        ai: state.currentModel, 
+                        messages: [
+                            ...chat.messages.slice(0, -2).map(m => ({ 
+                                role: m.sender === 'user' ? 'user' : 'assistant', 
+                                content: m.text 
+                            })),
+                            { role: 'user', content: expandPrompt }
+                        ]
+                    })
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.response) {
+                    aiMessage.fullText = data.response;
+                    
+                    if (state.settings.typingAnimation) {
+                        startTypingEffect(aiMessage.id, aiMessage.fullText);
+                    } else {
+                        aiMessage.text = aiMessage.fullText;
+                        aiMessage.isTyping = false;
+                        renderMessages();
+                    }
+                }
+            } catch (error) {
+                console.error('Error expanding response:', error);
+                aiMessage.text = `Sorry, I couldn't expand on the response: ${error.message}`;
+                aiMessage.isTyping = false;
+                renderMessages();
+            }
+        }
+        
         function renderChatList(searchQuery = '') { 
             const filtered = state.chats.filter(c => c.title.toLowerCase().includes(searchQuery)); 
             if (filtered.length === 0) { 
@@ -536,6 +1487,7 @@
             }).join(''); 
             lucide.createIcons(); 
         }
+        
         function createNewChat(select = true) { 
             const chat = { 
                 id: crypto.randomUUID(), 
@@ -548,7 +1500,14 @@
             if (select) selectChat(chat.id); 
             return chat.id; 
         }
+        
         function selectChat(id) { 
+            // Clear any ongoing typing animations
+            Object.keys(state.typingIntervals).forEach(messageId => {
+                clearInterval(state.typingIntervals[messageId]);
+                delete state.typingIntervals[messageId];
+            });
+            
             if (!id && state.chats.length > 0) id = state.chats[0].id; 
             if (!id) return; 
             state.selectedChatId = id; 
@@ -563,6 +1522,7 @@
                 toggleSidebar(); 
             } 
         }
+        
         function deleteChat(e, id) { 
             e.stopPropagation(); 
             if (!confirm('Delete this conversation?')) return; 
@@ -575,6 +1535,7 @@
             saveState(); 
             showToast('Chat deleted', 'success'); 
         }
+        
         function clearChat() { 
             if (!state.selectedChatId || !confirm('Clear all messages in this conversation?')) return; 
             const chat = state.chats.find(c => c.id === state.selectedChatId); 
@@ -585,6 +1546,7 @@
                 showToast('Conversation cleared', 'success'); 
             } 
         }
+        
         async function regenerateResponse(index) { 
             if (state.chatStatus !== 'idle') return; 
             const chat = state.chats.find(c => c.id === state.selectedChatId); 
@@ -593,9 +1555,17 @@
             chat.messages.splice(index-1); 
             await sendMessage(); 
         }
+        
         function openSettingsModal() { 
             document.getElementById('darkModeToggle').checked = state.settings.darkMode; 
             document.getElementById('typingToggle').checked = state.settings.typingAnimation; 
+            document.getElementById('webSearchToggle').checked = state.settings.webSearch;
+            document.getElementById('imageGenToggle').checked = state.settings.imageGeneration;
+            document.getElementById('voiceInputToggle').checked = state.settings.voiceInput;
+            
+            // Show/hide voice button based on voice input setting
+            D.voiceBtn.style.display = state.settings.voiceInput ? 'flex' : 'none';
+            
             setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn'); 
             setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn');
             
@@ -653,9 +1623,13 @@
             
             showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info');
         }
+        
         function saveSettings() { 
             state.settings.darkMode = document.getElementById('darkModeToggle').checked; 
             state.settings.typingAnimation = document.getElementById('typingToggle').checked; 
+            state.settings.webSearch = document.getElementById('webSearchToggle').checked;
+            state.settings.imageGeneration = document.getElementById('imageGenToggle').checked;
+            state.settings.voiceInput = document.getElementById('voiceInputToggle').checked;
             state.settings.fontSize = document.querySelector('.fontSizeBtn.active').dataset.size; 
             state.settings.typingSpeed = document.querySelector('.typingSpeedBtn.active').dataset.speed; 
             applySettings(); 
@@ -663,10 +1637,12 @@
             D.settingsModal.classList.add('hidden'); 
             showToast('Settings saved!', 'success'); 
         }
+        
         function resetSettings() { 
             state.settings = { ...defaultSettings }; 
             openSettingsModal(); 
         }
+        
         function applySettings() { 
             D.html.classList.toggle('dark', state.settings.darkMode); 
             const sizeMap = { 
@@ -675,12 +1651,17 @@
                 large: 'var(--font-size-lg)' 
             }; 
             D.html.style.fontSize = sizeMap[state.settings.fontSize]; 
+            
+            // Show/hide voice button based on voice input setting
+            D.voiceBtn.style.display = state.settings.voiceInput ? 'flex' : 'none';
         }
+        
         function saveState() { 
             localStorage.setItem('ajstudioz_chats', JSON.stringify(state.chats)); 
             localStorage.setItem('ajstudioz_settings', JSON.stringify(state.settings)); 
             localStorage.setItem('ajstudioz_lastChatId', state.selectedChatId); 
         }
+        
         function loadState() { 
             const chats = localStorage.getItem('ajstudioz_chats'); 
             const settings = localStorage.getItem('ajstudioz_settings'); 
@@ -689,6 +1670,7 @@
             if (settings) state.settings = { ...defaultSettings, ...JSON.parse(settings) }; 
             if (lastChatId) state.selectedChatId = lastChatId; 
         }
+        
         function setChatStatus(status) { 
             state.chatStatus = status; 
             if (status === 'waiting' || status === 'streaming') { 
@@ -696,7 +1678,15 @@
                 D.messageInput.placeholder = 'AI is responding...'; 
                 if (status === 'streaming') { 
                     D.sendBtn.innerHTML = `<i data-lucide="square" class="h-4 w-4"></i>`; 
-                    D.sendBtn.onclick = () => state.abortController?.abort(); 
+                    D.sendBtn.onclick = () => { 
+                        // Stop any typing animations
+                        Object.keys(state.typingIntervals).forEach(messageId => {
+                            clearInterval(state.typingIntervals[messageId]);
+                            delete state.typingIntervals[messageId];
+                        });
+                        
+                        state.abortController?.abort(); 
+                    }; 
                     D.sendBtn.title = "Stop Generating"; 
                 } else { 
                     D.sendBtn.innerHTML = `<div class="spinner"></div>`; 
@@ -713,16 +1703,19 @@
             } 
             lucide.createIcons(); 
         }
+        
         function toggleSidebar() { 
             D.sidebar.classList.toggle('open'); 
             D.sidebarOverlay.classList.toggle('show'); 
         }
+        
         function handleInputKeydown(e) { 
             if (e.key === 'Enter' && !e.shiftKey) { 
                 e.preventDefault(); 
                 sendMessage(); 
             } 
         }
+        
         function setActiveButton(target, selector) { 
             document.querySelectorAll(selector).forEach(btn => { 
                 btn.classList.remove('active', 'bg-primary', 'text-primary-foreground'); 
@@ -731,6 +1724,7 @@
             target.classList.add('active', 'bg-primary', 'text-primary-foreground'); 
             target.classList.remove('bg-secondary', 'text-secondary-foreground'); 
         }
+        
         function setSuggestion(text) {
             D.messageInput.value = text;
             D.messageInput.focus();
@@ -754,6 +1748,7 @@
                 setTimeout(() => toastContainer.removeChild(toast), 300); 
             }, 3000); 
         }
+        
         function processMessageText(text) {
             if (!text) return '';
             let html = escapeHtml(text).replace(/\n/g, '<br>');
@@ -781,18 +1776,23 @@
                        .replace(/<\/ol><br><ol>/g, '');
             return html;
         }
+        
         function isScrolledToBottom(el) { 
             return el.scrollHeight - el.scrollTop - el.clientHeight < 50; 
         }
+        
         function scrollToBottom(el, behavior = 'smooth') { 
             el.scrollTo({ top: el.scrollHeight, behavior: behavior }); 
         }
+        
         function escapeHtml(text) { 
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
         }
+        
         function copyMessage(text) { 
             navigator.clipboard.writeText(text).then(() => showToast('Message copied!', 'success')); 
         }
+        
         function copyCode(btn) { 
             const code = btn.closest('.code-block').dataset.code; 
             navigator.clipboard.writeText(code).then(() => showToast('Code copied!', 'success')); 
