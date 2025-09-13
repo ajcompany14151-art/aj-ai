@@ -31,7 +31,7 @@ export default async function handler(req, res) {
       }
       url = "https://api.groq.com/openai/v1/chat/completions";
       headers.Authorization = `Bearer ${GROQ_API_KEY}`;
-      model = "llama3-8b-8192"; // Fast model
+      model = "llama-3.1-70b-versatile"; // Fast model
       body = {
         model,
         messages: messages.map(m => ({
