@@ -16,6 +16,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid chat history provided" });
     }
     
+    console.log(`Processing request with AI model: ${ai}`);
+    console.log(`Messages count: ${messages.length}`);
+    
     let url = "";
     let headers = { "Content-Type": "application/json" };
     let body = {};
@@ -24,6 +27,7 @@ export default async function handler(req, res) {
     if (ai === "grok") {
       const GROQ_API_KEY = process.env.GROQ_API_KEY;
       if (!GROQ_API_KEY) {
+        console.log("GROQ_API_KEY not set");
         return res.status(500).json({ error: "GROQ_API_KEY not set" });
       }
       
@@ -31,7 +35,7 @@ export default async function handler(req, res) {
       headers.Authorization = `Bearer ${GROQ_API_KEY}`;
       
       body = {
-        model: "llama-3.3-70b-versatile",
+        model: "llama3-3-70b-versatile",
         messages: messages.map(m => ({
           role: m.role || (m.sender === "ai" ? "assistant" : "user"),
           content: m.content || m.text
@@ -44,6 +48,7 @@ export default async function handler(req, res) {
     else if (ai === "gemini") {
       const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
       if (!GEMINI_API_KEY) {
+        console.log("GEMINI_API_KEY not set");
         return res.status(500).json({ error: "GEMINI_API_KEY not set" });
       }
       
@@ -101,11 +106,15 @@ export default async function handler(req, res) {
           });
         }
         
+        console.log("Calling Z-AI SDK with messages:", formattedMessages);
+        
         const completion = await zai.chat.completions.create({
           messages: formattedMessages,
           temperature: 0.7,
           max_tokens: 2048,
         });
+        
+        console.log("Z-AI response:", completion);
         
         const botResponse = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
         return res.status(200).json({ response: botResponse });
@@ -124,11 +133,14 @@ export default async function handler(req, res) {
     }
     
     // Call the API
+    console.log(`Calling ${ai} API at: ${url}`);
     const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(body)
     });
+    
+    console.log(`${ai} API response status:`, response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -140,6 +152,7 @@ export default async function handler(req, res) {
     }
     
     const data = await response.json();
+    console.log(`${ai} API response data:`, data);
     
     // Extract AI response
     let botResponse = "No response";
@@ -153,6 +166,8 @@ export default async function handler(req, res) {
         botResponse = `I am unable to provide a response. Reason: ${data.promptFeedback?.blockReason || "Unknown"}`;
       }
     }
+    
+    console.log(`Final response from ${ai}:`, botResponse);
     
     return res.status(200).json({ response: botResponse });
     
