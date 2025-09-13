@@ -1,23 +1,18 @@
-**
- * Vercel Serverless Function to proxy requests to Grok & Gemini APIs.
- * Place this file in the /api directory.
- */
+// api/chat.js
 export default async function handler(req, res) {
-  // 1. Only allow POST requests
+  // Only allow POST requests
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
   
   try {
-    // 2. Get input from frontend
     const { ai, messages } = req.body;
+    
     if (!ai) {
-      return res.status(400).json({ error: "Missing 'ai' field (grok or gemini)" });
+      return res.status(400).json({ error: "Missing 'ai' field (grok, gemini, or zai)" });
     }
     
-    // Support both history[] and messages[]
-    const chatHistory = messages;
-    if (!chatHistory || !Array.isArray(chatHistory)) {
+    if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: "Invalid chat history provided" });
     }
     
@@ -25,7 +20,7 @@ export default async function handler(req, res) {
     let headers = { "Content-Type": "application/json" };
     let body = {};
     
-    // 3. GROK branch
+    // GROQ branch
     if (ai === "grok") {
       const GROQ_API_KEY = process.env.GROQ_API_KEY;
       if (!GROQ_API_KEY) {
@@ -36,14 +31,16 @@ export default async function handler(req, res) {
       headers.Authorization = `Bearer ${GROQ_API_KEY}`;
       
       body = {
-        model: "llama-3.3-70b-versatile", // default Grok model
-        messages: chatHistory.map(m => ({
+        model: "llama-3.3-70b-versatile",
+        messages: messages.map(m => ({
           role: m.role || (m.sender === "ai" ? "assistant" : "user"),
           content: m.content || m.text
-        }))
+        })),
+        temperature: 0.7,
+        max_tokens: 1024
       };
     }
-    // 4. GEMINI branch
+    // GEMINI branch
     else if (ai === "gemini") {
       const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
       if (!GEMINI_API_KEY) {
@@ -53,7 +50,7 @@ export default async function handler(req, res) {
       url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
       
       let systemInstruction = null;
-      const contents = chatHistory
+      const contents = messages
         .map(turn => {
           if (turn.role === "system") {
             systemInstruction = { parts: [{ text: turn.content || turn.text }] };
@@ -76,22 +73,22 @@ export default async function handler(req, res) {
           { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
         ],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.8,
           topK: 1,
           topP: 1,
-          maxOutputTokens: 1024
+          maxOutputTokens: 2048
         }
       };
     }
-    // 5. Use Z-AI SDK as fallback
-    else {
+    // Z-AI branch
+    else if (ai === "zai") {
       try {
-        // Import the Z-AI SDK dynamically
+        // Import the Z-AI SDK
         const ZAI = await import('z-ai-web-dev-sdk');
         const zai = await ZAI.create();
         
         // Convert messages to the format expected by ZAI
-        const formattedMessages = chatHistory.map((msg) => ({
+        const formattedMessages = messages.map((msg) => ({
           role: msg.role === 'assistant' ? 'assistant' : 'user',
           content: msg.content || msg.text
         }));
@@ -100,29 +97,33 @@ export default async function handler(req, res) {
         if (!formattedMessages.some(msg => msg.role === 'system')) {
           formattedMessages.unshift({
             role: 'system',
-            content: 'You are a helpful AI assistant. Provide clear, concise, and accurate responses.'
+            content: 'You are AJ, an advanced AI assistant created by AJ STUDIOZ. Provide helpful, accurate, and insightful responses.'
           });
         }
         
         const completion = await zai.chat.completions.create({
           messages: formattedMessages,
           temperature: 0.7,
-          max_tokens: 1024,
+          max_tokens: 2048,
         });
         
-        const botResponse = completion.choices[0]?.message?.content || "No response";
+        const botResponse = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
         return res.status(200).json({ response: botResponse });
         
       } catch (zaiError) {
         console.error('Z-AI SDK Error:', zaiError);
         return res.status(500).json({
-          error: "AI service error",
-          details: "Both external APIs and Z-AI SDK failed"
+          error: "Z-AI service error",
+          details: zaiError.message
         });
       }
     }
+    // Unknown AI model
+    else {
+      return res.status(400).json({ error: "Invalid AI model specified" });
+    }
     
-    // 6. Call the API
+    // Call the API
     const response = await fetch(url, {
       method: "POST",
       headers,
@@ -140,7 +141,7 @@ export default async function handler(req, res) {
     
     const data = await response.json();
     
-    // 7. Extract AI response
+    // Extract AI response
     let botResponse = "No response";
     
     if (ai === "grok") {
