@@ -35,9 +35,7 @@ export default async function handler(req, res) {
           response: `I'm AJ-Fast, your Groq-powered assistant. I'm currently running in demonstration mode since the GROQ_API_KEY is not configured. 
         
 You asked: "${userMessage}"
-
 In a real deployment, I would provide intelligent responses using Groq's Llama 3 model. To enable full functionality, please add your Groq API key to the environment variables.
-
 This is a simulated response for demonstration purposes. The actual AI would provide much more detailed and accurate responses based on your query.`
         });
       }
@@ -68,9 +66,7 @@ This is a simulated response for demonstration purposes. The actual AI would pro
           response: `I'm AJ-Creative, your Gemini-powered assistant. I'm currently running in demonstration mode since the GEMINI_API_KEY is not configured.
         
 You asked: "${userMessage}"
-
 In a real deployment, I would provide creative and intelligent responses using Google's Gemini model. To enable full functionality, please add your Gemini API key to the environment variables.
-
 This is a simulated response for demonstration purposes. The actual AI would provide much more detailed, creative, and accurate responses based on your query.`
         });
       }
@@ -124,11 +120,8 @@ This is a simulated response for demonstration purposes. The actual AI would pro
           // In a real implementation, this would use Z-AI web search
           return res.status(200).json({ 
             response: `I'm AJ-Advanced, your Z-AI powered assistant. I detected that you're asking about current information that would require web search.
-
 You asked: "${userMessage}"
-
 In a real deployment with proper Z-AI SDK integration, I would search the web for the most current information and provide you with up-to-date results.
-
 This is a simulated response for demonstration purposes. The actual AI would perform real web searches and provide current, accurate information.`
           });
         }
@@ -139,11 +132,8 @@ This is a simulated response for demonstration purposes. The actual AI would per
           // In a real implementation, this would use Z-AI image generation
           return res.status(200).json({ 
             response: `I'm AJ-Advanced, your Z-AI powered assistant. I detected that you're requesting an image generation.
-
 You asked: "${userMessage}"
-
 In a real deployment with proper Z-AI SDK integration, I would generate an image based on your description and provide it to you.
-
 This is a simulated response for demonstration purposes. The actual AI would generate real images based on your prompts.`
           });
         }
@@ -151,11 +141,8 @@ This is a simulated response for demonstration purposes. The actual AI would gen
         // Regular response for Z-AI
         return res.status(200).json({ 
           response: `I'm AJ-Advanced, your Z-AI powered assistant. I'm currently running in demonstration mode for Vercel deployment.
-
 You asked: "${userMessage}"
-
 In a real deployment with proper Z-AI SDK integration, I would provide advanced responses with capabilities like web search, image generation, and more sophisticated AI processing.
-
 This is a simulated response for demonstration purposes. The actual Z-AI assistant would provide much more comprehensive and feature-rich responses.`
         });
         
