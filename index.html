@@ -546,7 +546,6 @@
                 </button>
             </div>
             <div class="p-6 space-y-8 max-h-96 overflow-y-auto">
-                <!-- AI Model Selection -->
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
@@ -585,7 +584,6 @@
                     </div>
                 </div>
                 <div class="border-t border-border pt-6"></div>
-                <!-- Advanced Features -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Advanced Features</h4>
                     
@@ -623,7 +621,6 @@
                     </div>
                 </div>
                 <div class="border-t border-border pt-6"></div>
-                <!-- Appearance Settings -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Appearance</h4>
                     
@@ -644,7 +641,6 @@
                     </div>
                 </div>
                 <div class="border-t border-border pt-6"></div>
-                <!-- Text Settings -->
                 <div class="space-y-6">
                     <h4 class="font-medium text-lg">Text Settings</h4>
                     
@@ -717,7 +713,7 @@
             },
             zai: { 
                 name: 'AJ-Advanced (Z-AI)', 
-                apiModel: 'z-ai-advanced', 
+                apiModel: 'gemini-1.5-pro', // Using a more powerful model for "Advanced"
                 color: 'from-green-500 to-teal-600', 
                 icon: 'AJ', 
                 endpoint: '/api/chat',
@@ -969,90 +965,59 @@
             state.abortController = new AbortController();
             
             try {
-                // Check if we need to perform web search
-                let enhancedMessages = [...chat.messages.slice(0, -1).map(m => ({ 
-                    role: m.sender === 'user' ? 'user' : 'assistant', 
-                    content: m.text 
-                }))];
-                
-                // If web search is enabled and the query might need current information
-                if (state.settings.webSearch && state.currentModel === 'zai') {
-                    const webSearchQuery = extractWebSearchQuery(messageText);
-                    if (webSearchQuery) {
-                        try {
-                            const webResults = await performWebSearch(webSearchQuery);
-                            if (webResults && webResults.length > 0) {
-                                aiMessage.webResults = webResults;
-                                
-                                // Add web search context to the message
-                                enhancedMessages[enhancedMessages.length - 1].content += `\n\nWeb search results for context:\n${webResults.map(r => `- ${r.title}: ${r.snippet}`).join('\n')}`;
-                            }
-                        } catch (error) {
-                            console.error('Web search error:', error);
-                        }
+                // Prepare message history for API
+                const messagesForApi = chat.messages.slice(0, -1).map(m => ({
+                    role: m.sender === 'user' ? 'user' : 'assistant',
+                    content: m.text
+                }));
+
+                // Check for features specific to Z-AI (Advanced model)
+                if (state.currentModel === 'zai') {
+                    if (state.settings.webSearch && extractWebSearchQuery(messageText)) {
+                         messagesForApi[messagesForApi.length - 1].content += "\n\n[SYSTEM NOTE: User query may require current information. Perform a web search if necessary to provide an up-to-date answer.]";
+                    }
+                    if (state.settings.imageGeneration && containsImageGenerationRequest(messageText)) {
+                        messagesForApi[messagesForApi.length - 1].content += `\n\n[SYSTEM NOTE: User is asking to generate an image with the prompt: "${extractImagePrompt(messageText)}". Instead of generating an image, describe it in rich detail.]`;
                     }
                 }
-                
-                // Check if we need to generate an image
-                if (state.settings.imageGeneration && containsImageGenerationRequest(messageText)) {
-                    try {
-                        const imagePrompt = extractImagePrompt(messageText);
-                        if (imagePrompt) {
-                            const imageData = await generateImage(imagePrompt);
-                            if (imageData) {
-                                aiMessage.images.push({
-                                    prompt: imagePrompt,
-                                    data: imageData
-                                });
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Image generation error:', error);
-                    }
-                }
-                
+
                 const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         ai: state.currentModel, 
-                        messages: enhancedMessages
+                        messages: messagesForApi
                     }),
                     signal: state.abortController.signal
                 });
                 
-                console.log('API Response Status:', response.status);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.details || `HTTP error! status: ${response.status}`);
+                }
                 
                 setChatStatus('streaming');
                 const data = await response.json();
-                console.log('API Response:', data);
                 
-                // Handle the response from our API
                 if (data.response) {
                     aiMessage.fullText = data.response;
-                    
-                    // Start typing effect if enabled
                     if (state.settings.typingAnimation) {
                         startTypingEffect(aiMessage.id, aiMessage.fullText);
                     } else {
-                        // If typing animation is disabled, show the full text immediately
                         aiMessage.text = aiMessage.fullText;
                         aiMessage.isTyping = false;
                         renderMessages();
                     }
                 } else {
-                    throw new Error('No response from API');
+                    throw new Error('No response content from API');
                 }
                 
             } catch (error) {
                 console.error('Error in sendMessage:', error);
-                if (error.name === 'AbortError') { 
-                    aiMessage.text += "\n\n*Generation stopped by user.*"; 
-                } else {
-                    aiMessage.text = `Sorry, I encountered an error: ${error.message}`;
-                    aiMessage.isError = true;
-                }
+                aiMessage.text = (error.name === 'AbortError') 
+                    ? "\n\n*Generation stopped by user.*" 
+                    : `Sorry, I encountered an error: ${error.message}`;
+                aiMessage.isError = true;
                 aiMessage.isTyping = false;
                 renderMessages();
             } finally {
@@ -1069,48 +1034,8 @@
                 'latest', 'recent', 'current', 'today', 'yesterday', 'news', 'update',
                 'what is happening', 'what happened', 'weather', 'stock price', 'score'
             ];
-            
             const lowerMessage = message.toLowerCase();
-            if (webSearchKeywords.some(keyword => lowerMessage.includes(keyword))) {
-                return message;
-            }
-            
-            // Check for questions about recent events
-            const recentEventPatterns = [
-                /what happened (today|yesterday|recently|lately)/i,
-                /latest (news|update|information) about/i,
-                /current (status|situation|price|value)/i
-            ];
-            
-            if (recentEventPatterns.some(pattern => pattern.test(message))) {
-                return message;
-            }
-            
-            return null;
-        }
-        
-        // Perform web search using Z-AI SDK
-        async function performWebSearch(query) {
-            try {
-                // For static HTML, we'll simulate web search
-                // In a real implementation, this would use the Z-AI SDK
-                console.log('Performing web search for:', query);
-                return [
-                    {
-                        name: 'Search Result 1',
-                        url: 'https://example.com/1',
-                        snippet: 'This is a sample search result snippet for the query.'
-                    },
-                    {
-                        name: 'Search Result 2',
-                        url: 'https://example.com/2',
-                        snippet: 'Another sample search result with relevant information.'
-                    }
-                ];
-            } catch (error) {
-                console.error('Web search error:', error);
-                return null;
-            }
+            return webSearchKeywords.some(keyword => lowerMessage.includes(keyword)) ? message : null;
         }
         
         // Check if message contains image generation request
@@ -1119,79 +1044,46 @@
                 'generate', 'create', 'draw', 'make', 'show me', 'image of', 'picture of',
                 'visualize', 'illustration', 'art', 'design'
             ];
-            
             const lowerMessage = message.toLowerCase();
             return imageKeywords.some(keyword => lowerMessage.includes(keyword));
         }
         
         // Extract image prompt from user message
         function extractImagePrompt(message) {
-            // Simple extraction - in a real app, this would be more sophisticated
             const imagePromptPatterns = [
                 /generate (an? )?image of (.+)/i,
                 /create (an? )?(picture|image|art) of (.+)/i,
                 /draw (.+)/i,
                 /show me (an? )?image of (.+)/i
             ];
-            
             for (const pattern of imagePromptPatterns) {
                 const match = message.match(pattern);
-                if (match) {
-                    return match[2] || match[1];
-                }
+                if (match) return match[2] || match[1];
             }
-            
-            // If no pattern matches, use the whole message as the prompt
             return message;
-        }
-        
-        // Generate image using Z-AI SDK
-        async function generateImage(prompt) {
-            try {
-                // For static HTML, we'll simulate image generation
-                // In a real implementation, this would use the Z-AI SDK
-                console.log('Generating image for prompt:', prompt);
-                return 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-            } catch (error) {
-                console.error('Image generation error:', error);
-                return null;
-            }
         }
         
         // Function to start the typing effect
         function startTypingEffect(messageId, fullText) {
-            // Clear any existing interval for this message
-            if (state.typingIntervals[messageId]) {
-                clearInterval(state.typingIntervals[messageId]);
-            }
-            
+            if (state.typingIntervals[messageId]) clearInterval(state.typingIntervals[messageId]);
             const chat = state.chats.find(c => c.id === state.selectedChatId);
             if (!chat) return;
-            
             const message = chat.messages.find(m => m.id === messageId);
             if (!message) return;
             
             let index = 0;
             const typingSpeed = TYPING_SPEEDS[state.settings.typingSpeed];
-            
-            // Update the message to show typing cursor
             message.text = '';
             renderMessages();
             
-            // Set up the typing interval
             state.typingIntervals[messageId] = setInterval(() => {
                 if (index < fullText.length) {
-                    // Add the next character
                     message.text = fullText.substring(0, index + 1);
                     index++;
-                    
-                    // Update the message in the DOM
                     updateMessageText(messageId, message.text);
                 } else {
-                    // Typing is complete
                     clearInterval(state.typingIntervals[messageId]);
                     delete state.typingIntervals[messageId];
-                    
                     message.isTyping = false;
                     renderMessages();
                     setChatStatus('idle');
@@ -1204,12 +1096,9 @@
         function updateMessageText(messageId, text) {
             const messageElement = document.getElementById(`message-${messageId}`);
             if (!messageElement) return;
-            
             const contentElement = messageElement.querySelector('.message-content');
             if (!contentElement) return;
-            
-            // Update the text content
-            contentElement.innerHTML = escapeHtml(text) + '<span class="cursor"></span>';
+            contentElement.innerHTML = escapeHtml(text).replace(/\n/g, '<br>') + '<span class="cursor"></span>';
         }
         
         function renderMessages() {
@@ -1229,42 +1118,9 @@
                     `<div class="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-bold">U</div>` : 
                     `<div class="w-8 h-8 rounded-full bg-gradient-to-r ${config.color} flex-shrink-0 flex items-center justify-center text-white font-bold">${config.icon}</div>`;
                 
-                let content = '';
-                if (msg.isTyping) {
-                    // Show the typing text with cursor
-                    content = `<div class="typing-text">${escapeHtml(msg.text)}<span class="cursor"></span></div>`;
-                } else {
-                    // Show the fully formatted message
-                    content = processMessageText(msg.fullText || msg.text);
-                    
-                    // Add web search results if any
-                    if (msg.webResults && msg.webResults.length > 0) {
-                        content += '<div class="web-search-results">';
-                        content += '<h4 class="font-medium mb-2">Web Search Results:</h4>';
-                        msg.webResults.slice(0, 3).forEach(result => {
-                            content += `
-                                <div class="web-search-result">
-                                    <div class="web-search-result-title">${escapeHtml(result.name)}</div>
-                                    <div class="web-search-result-url">${escapeHtml(result.url)}</div>
-                                    <div class="web-search-result-snippet">${escapeHtml(result.snippet)}</div>
-                                </div>
-                            `;
-                        });
-                        content += '</div>';
-                    }
-                    
-                    // Add generated images if any
-                    if (msg.images && msg.images.length > 0) {
-                        msg.images.forEach(image => {
-                            content += `
-                                <div class="image-container">
-                                    <img src="data:image/png;base64,${image.data}" alt="${escapeHtml(image.prompt)}">
-                                    <div class="image-caption">Generated: ${escapeHtml(image.prompt)}</div>
-                                </div>
-                            `;
-                        });
-                    }
-                }
+                const content = msg.isTyping ? 
+                    `<div class="typing-text">${escapeHtml(msg.text)}<span class="cursor"></span></div>` :
+                    processMessageText(msg.fullText || msg.text);
                 
                 const messageBubble = `
                     <div class="message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'} ${msg.isError ? 'error-message' : ''}">
@@ -1276,16 +1132,9 @@
                                     ${msg.sender === 'ai' ? `<span class="model-badge ${config.badgeClass}">${config.name.split(' ')[0]}</span>` : ''}
                                 </div>
                                 <div class="flex gap-1">
-                                    ${msg.sender === 'ai' ? `<button onclick="regenerateResponse(${index})" class="p-1 hover:bg-accent rounded transition-colors" title="Regenerate"><i data-lucide="refresh-cw" class="h-3 w-3"></i></button>` : ''}
-                                    <button onclick="copyMessage('${escapeHtml(msg.fullText || msg.text)}')" class="p-1 hover:bg-accent rounded transition-colors" title="Copy"><i data-lucide="copy" class="h-3 w-3"></i></button>
+                                    ${msg.sender === 'ai' && index > 0 ? `<button onclick="regenerateResponse(${index})" class="p-1 hover:bg-accent rounded transition-colors" title="Regenerate"><i data-lucide="refresh-cw" class="h-3 w-3"></i></button>` : ''}
+                                    <button onclick="copyMessage('${msg.id}')" class="p-1 hover:bg-accent rounded transition-colors" title="Copy"><i data-lucide="copy" class="h-3 w-3"></i></button>
                                 </div>
-                            </div>
-                            <div class="quick-actions">
-                                ${msg.sender === 'ai' ? `
-                                    <button onclick="summarizeResponse(${index})" class="quick-action-btn">Summarize</button>
-                                    <button onclick="explainResponse(${index})" class="quick-action-btn">Explain</button>
-                                    <button onclick="expandResponse(${index})" class="quick-action-btn">Expand</button>
-                                ` : ''}
                             </div>
                         ` : ''}
                     </div>`;
@@ -1294,221 +1143,7 @@
             }).join('');
             
             lucide.createIcons();
-            if(!chat.messages[chat.messages.length - 1].isTyping) scrollToBottom(D.chatContainer);
-        }
-        
-        // Quick action functions
-        async function summarizeResponse(index) {
-            if (state.chatStatus !== 'idle') return;
-            
-            const chat = state.chats.find(c => c.id === state.selectedChatId);
-            if (!chat || index < 0 || chat.messages[index]?.sender !== 'ai') return;
-            
-            const originalMessage = chat.messages[index];
-            const summaryPrompt = `Please summarize the following response in a concise way:\n\n${originalMessage.fullText || originalMessage.text}`;
-            
-            // Create a new message with the summary request
-            chat.messages.push({ 
-                id: crypto.randomUUID(), 
-                sender: 'user', 
-                text: "Summarize the previous response", 
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-            });
-            
-            const aiMessage = { 
-                id: crypto.randomUUID(), 
-                sender: 'ai', 
-                text: '', 
-                fullText: '', 
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-                aiType: state.currentModel, 
-                isTyping: true 
-            };
-            
-            chat.messages.push(aiMessage);
-            
-            renderMessages();
-            saveState();
-            
-            try {
-                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        ai: state.currentModel, 
-                        messages: [
-                            ...chat.messages.slice(0, -2).map(m => ({ 
-                                role: m.sender === 'user' ? 'user' : 'assistant', 
-                                content: m.text 
-                            })),
-                            { role: 'user', content: summaryPrompt }
-                        ]
-                    })
-                });
-                
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.response) {
-                    aiMessage.fullText = data.response;
-                    
-                    if (state.settings.typingAnimation) {
-                        startTypingEffect(aiMessage.id, aiMessage.fullText);
-                    } else {
-                        aiMessage.text = aiMessage.fullText;
-                        aiMessage.isTyping = false;
-                        renderMessages();
-                    }
-                }
-            } catch (error) {
-                console.error('Error summarizing response:', error);
-                aiMessage.text = `Sorry, I couldn't summarize the response: ${error.message}`;
-                aiMessage.isTyping = false;
-                renderMessages();
-            }
-        }
-        
-        async function explainResponse(index) {
-            if (state.chatStatus !== 'idle') return;
-            
-            const chat = state.chats.find(c => c.id === state.selectedChatId);
-            if (!chat || index < 0 || chat.messages[index]?.sender !== 'ai') return;
-            
-            const originalMessage = chat.messages[index];
-            const explainPrompt = `Please explain the following response in simpler terms:\n\n${originalMessage.fullText || originalMessage.text}`;
-            
-            // Create a new message with the explanation request
-            chat.messages.push({ 
-                id: crypto.randomUUID(), 
-                sender: 'user', 
-                text: "Explain the previous response in simpler terms", 
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-            });
-            
-            const aiMessage = { 
-                id: crypto.randomUUID(), 
-                sender: 'ai', 
-                text: '', 
-                fullText: '', 
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-                aiType: state.currentModel, 
-                isTyping: true 
-            };
-            
-            chat.messages.push(aiMessage);
-            
-            renderMessages();
-            saveState();
-            
-            try {
-                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        ai: state.currentModel, 
-                        messages: [
-                            ...chat.messages.slice(0, -2).map(m => ({ 
-                                role: m.sender === 'user' ? 'user' : 'assistant', 
-                                content: m.text 
-                            })),
-                            { role: 'user', content: explainPrompt }
-                        ]
-                    })
-                });
-                
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.response) {
-                    aiMessage.fullText = data.response;
-                    
-                    if (state.settings.typingAnimation) {
-                        startTypingEffect(aiMessage.id, aiMessage.fullText);
-                    } else {
-                        aiMessage.text = aiMessage.fullText;
-                        aiMessage.isTyping = false;
-                        renderMessages();
-                    }
-                }
-            } catch (error) {
-                console.error('Error explaining response:', error);
-                aiMessage.text = `Sorry, I couldn't explain the response: ${error.message}`;
-                aiMessage.isTyping = false;
-                renderMessages();
-            }
-        }
-        
-        async function expandResponse(index) {
-            if (state.chatStatus !== 'idle') return;
-            
-            const chat = state.chats.find(c => c.id === state.selectedChatId);
-            if (!chat || index < 0 || chat.messages[index]?.sender !== 'ai') return;
-            
-            const originalMessage = chat.messages[index];
-            const expandPrompt = `Please provide more details and expand on the following response:\n\n${originalMessage.fullText || originalMessage.text}`;
-            
-            // Create a new message with the expansion request
-            chat.messages.push({ 
-                id: crypto.randomUUID(), 
-                sender: 'user', 
-                text: "Provide more details on the previous response", 
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-            });
-            
-            const aiMessage = { 
-                id: crypto.randomUUID(), 
-                sender: 'ai', 
-                text: '', 
-                fullText: '', 
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-                aiType: state.currentModel, 
-                isTyping: true 
-            };
-            
-            chat.messages.push(aiMessage);
-            
-            renderMessages();
-            saveState();
-            
-            try {
-                const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        ai: state.currentModel, 
-                        messages: [
-                            ...chat.messages.slice(0, -2).map(m => ({ 
-                                role: m.sender === 'user' ? 'user' : 'assistant', 
-                                content: m.text 
-                            })),
-                            { role: 'user', content: expandPrompt }
-                        ]
-                    })
-                });
-                
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.response) {
-                    aiMessage.fullText = data.response;
-                    
-                    if (state.settings.typingAnimation) {
-                        startTypingEffect(aiMessage.id, aiMessage.fullText);
-                    } else {
-                        aiMessage.text = aiMessage.fullText;
-                        aiMessage.isTyping = false;
-                        renderMessages();
-                    }
-                }
-            } catch (error) {
-                console.error('Error expanding response:', error);
-                aiMessage.text = `Sorry, I couldn't expand on the response: ${error.message}`;
-                aiMessage.isTyping = false;
-                renderMessages();
-            }
+            if(!chat.messages[chat.messages.length - 1]?.isTyping) scrollToBottom(D.chatContainer);
         }
         
         function renderChatList(searchQuery = '') { 
@@ -1519,7 +1154,8 @@
             } 
             D.chatList.innerHTML = filtered.map(chat => { 
                 const config = MODEL_CONFIGS[chat.model]; 
-                return `<div class="chat-item ${state.selectedChatId === chat.id ? 'active' : ''}" onclick="selectChat('${chat.id}')"><div class="chat-item-icon bg-gradient-to-r ${config.color} text-white">${config.icon}</div><div class="flex-1 min-w-0"><h3 class="font-medium truncate">${escapeHtml(chat.title)}</h3><p class="text-xs text-muted-foreground">${chat.date}</p></div><button onclick="deleteChat(event, '${chat.id}')" class="p-1 opacity-50 hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground rounded transition-colors"><i data-lucide="trash-2" class="h-3 w-3"></i></button></div>`; 
+                const iconHtml = `<div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-white font-bold bg-gradient-to-r ${config.color}">${config.icon}</div>`;
+                return `<div class="chat-item ${state.selectedChatId === chat.id ? 'active' : ''}" onclick="selectChat('${chat.id}')">${iconHtml}<div class="flex-1 min-w-0"><h3 class="font-medium truncate">${escapeHtml(chat.title)}</h3><p class="text-xs text-muted-foreground">${chat.date}</p></div><button onclick="deleteChat(event, '${chat.id}')" class="p-1 opacity-50 hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground rounded transition-colors"><i data-lucide="trash-2" class="h-3 w-3"></i></button></div>`; 
             }).join(''); 
             lucide.createIcons(); 
         }
@@ -1538,18 +1174,20 @@
         }
         
         function selectChat(id) { 
-            // Clear any ongoing typing animations
-            Object.keys(state.typingIntervals).forEach(messageId => {
-                clearInterval(state.typingIntervals[messageId]);
-                delete state.typingIntervals[messageId];
-            });
+            Object.values(state.typingIntervals).forEach(clearInterval);
+            state.typingIntervals = {};
             
             if (!id && state.chats.length > 0) id = state.chats[0].id; 
-            if (!id) return; 
+            if (!id) return createNewChat(true);
+            
             state.selectedChatId = id; 
             const chat = state.chats.find(c => c.id === id); 
             if (chat) { 
-                state.currentModel = chat.model; 
+                state.currentModel = chat.model;
+                document.querySelectorAll('.model-option-btn').forEach(btn => {
+                    const model = btn.dataset.model;
+                    selectModelInSettings(model, false); // Update UI without toast
+                });
                 renderMessages(); 
             } 
             renderChatList(); 
@@ -1565,9 +1203,8 @@
             state.chats = state.chats.filter(c => c.id !== id); 
             if (state.selectedChatId === id) { 
                 selectChat(state.chats[0]?.id); 
-            } else { 
-                renderChatList(); 
             } 
+            renderChatList();
             saveState(); 
             showToast('Chat deleted', 'success'); 
         }
@@ -1593,88 +1230,50 @@
         }
         
         function openSettingsModal() { 
-            // Set all toggle values
             document.getElementById('darkModeToggle').checked = state.settings.darkMode; 
             document.getElementById('typingToggle').checked = state.settings.typingAnimation; 
             document.getElementById('webSearchToggle').checked = state.settings.webSearch;
             document.getElementById('imageGenToggle').checked = state.settings.imageGeneration;
             document.getElementById('voiceInputToggle').checked = state.settings.voiceInput;
-            
-            // Show/hide voice button based on voice input setting
             D.voiceBtn.style.display = state.settings.voiceInput ? 'flex' : 'none';
-            
-            // Set active buttons for font size and typing speed
-            document.querySelectorAll('.fontSizeBtn').forEach(btn => {
-                if (btn.dataset.size === state.settings.fontSize) {
-                    setActiveButton(btn, '.fontSizeBtn');
-                } else {
-                    btn.classList.remove('active', 'bg-primary', 'text-primary-foreground');
-                    btn.classList.add('bg-secondary', 'text-secondary-foreground');
-                }
-            });
-            
-            document.querySelectorAll('.typingSpeedBtn').forEach(btn => {
-                if (btn.dataset.speed === state.settings.typingSpeed) {
-                    setActiveButton(btn, '.typingSpeedBtn');
-                } else {
-                    btn.classList.remove('active', 'bg-primary', 'text-primary-foreground');
-                    btn.classList.add('bg-secondary', 'text-secondary-foreground');
-                }
-            });
-            
-            // Update model selection UI
+            setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn');
+            setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn');
             updateModelSelectionUI();
-            
             D.settingsModal.classList.remove('hidden'); 
         }
         
         function updateModelSelectionUI() {
-            // Update current model display
-            const currentModelDisplay = document.getElementById('currentModelDisplay');
-            if (currentModelDisplay) {
-                currentModelDisplay.textContent = MODEL_CONFIGS[state.currentModel].name;
-            }
+            const currentModelName = MODEL_CONFIGS[state.currentModel]?.name || 'Unknown';
+            document.getElementById('currentModelDisplay').textContent = currentModelName;
             
-            // Update radio buttons
-            document.querySelectorAll('.model-radio').forEach(radio => {
-                const model = radio.dataset.model;
-                if (model === state.currentModel) {
-                    radio.style.backgroundColor = 'rgb(var(--primary))';
-                    radio.style.borderColor = 'rgb(var(--primary))';
-                    radio.innerHTML = '<div style="width: 100%; height: 100%; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center;"><div style="width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--primary));"></div></div>';
-                } else {
-                    radio.style.backgroundColor = 'transparent';
-                    radio.style.borderColor = 'rgb(var(--muted-foreground), 0.3)';
-                    radio.innerHTML = '';
-                }
-            });
-            
-            // Update button borders
             document.querySelectorAll('.model-option-btn').forEach(btn => {
                 const model = btn.dataset.model;
+                const radio = btn.querySelector('.model-radio');
                 if (model === state.currentModel) {
                     btn.style.borderColor = 'rgb(var(--primary))';
                     btn.style.backgroundColor = 'rgba(var(--primary), 0.1)';
+                    radio.style.backgroundColor = 'rgb(var(--primary))';
+                    radio.style.borderColor = 'rgb(var(--primary))';
+                    radio.innerHTML = '<div style="width: 8px; height: 8px; border-radius: 50%; background: white;"></div>';
                 } else {
                     btn.style.borderColor = 'transparent';
                     btn.style.backgroundColor = 'transparent';
+                    radio.style.backgroundColor = 'transparent';
+                    radio.style.borderColor = 'hsl(var(--border))';
+                    radio.innerHTML = '';
                 }
             });
         }
         
-        function selectModelInSettings(model) {
+        function selectModelInSettings(model, showNotif = true) {
             state.currentModel = model;
             updateModelSelectionUI();
-            
-            // Update current chat model if exists
-            if (state.selectedChatId) {
-                const chat = state.chats.find(c => c.id === state.selectedChatId);
-                if (chat) {
-                    chat.model = model;
-                }
+            const chat = state.chats.find(c => c.id === state.selectedChatId);
+            if (chat) {
+                chat.model = model;
+                renderChatList();
             }
-            
-            showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info');
+            if(showNotif) showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info');
         }
         
         function saveSettings() { 
@@ -1683,18 +1282,8 @@
             state.settings.webSearch = document.getElementById('webSearchToggle').checked;
             state.settings.imageGeneration = document.getElementById('imageGenToggle').checked;
             state.settings.voiceInput = document.getElementById('voiceInputToggle').checked;
-            
-            // Get the active font size button
-            const activeFontSizeBtn = document.querySelector('.fontSizeBtn.active');
-            if (activeFontSizeBtn) {
-                state.settings.fontSize = activeFontSizeBtn.dataset.size;
-            }
-            
-            // Get the active typing speed button
-            const activeTypingSpeedBtn = document.querySelector('.typingSpeedBtn.active');
-            if (activeTypingSpeedBtn) {
-                state.settings.typingSpeed = activeTypingSpeedBtn.dataset.speed;
-            }
+            state.settings.fontSize = document.querySelector('.fontSizeBtn.active').dataset.size;
+            state.settings.typingSpeed = document.querySelector('.typingSpeedBtn.active').dataset.speed;
             
             applySettings(); 
             saveState(); 
@@ -1709,27 +1298,21 @@
         
         function applySettings() { 
             D.html.classList.toggle('dark', state.settings.darkMode); 
-            const sizeMap = { 
-                small: 'var(--font-size-sm)', 
-                medium: 'var(--font-size-base)', 
-                large: 'var(--font-size-lg)' 
-            }; 
+            const sizeMap = { small: '0.875rem', medium: '0.95rem', large: '1.05rem' }; 
             D.html.style.fontSize = sizeMap[state.settings.fontSize]; 
-            
-            // Show/hide voice button based on voice input setting
             D.voiceBtn.style.display = state.settings.voiceInput ? 'flex' : 'none';
         }
         
         function saveState() { 
-            localStorage.setItem('ajstudioz_chats', JSON.stringify(state.chats)); 
-            localStorage.setItem('ajstudioz_settings', JSON.stringify(state.settings)); 
-            localStorage.setItem('ajstudioz_lastChatId', state.selectedChatId); 
+            localStorage.setItem('aj_assistant_chats', JSON.stringify(state.chats)); 
+            localStorage.setItem('aj_assistant_settings', JSON.stringify(state.settings)); 
+            localStorage.setItem('aj_assistant_lastChatId', state.selectedChatId); 
         }
         
         function loadState() { 
-            const chats = localStorage.getItem('ajstudioz_chats'); 
-            const settings = localStorage.getItem('ajstudioz_settings'); 
-            const lastChatId = localStorage.getItem('ajstudioz_lastChatId'); 
+            const chats = localStorage.getItem('aj_assistant_chats'); 
+            const settings = localStorage.getItem('aj_assistant_settings'); 
+            const lastChatId = localStorage.getItem('aj_assistant_lastChatId'); 
             if (chats) state.chats = JSON.parse(chats); 
             if (settings) state.settings = { ...defaultSettings, ...JSON.parse(settings) }; 
             if (lastChatId) state.selectedChatId = lastChatId; 
@@ -1737,34 +1320,22 @@
         
         function setChatStatus(status) { 
             state.chatStatus = status; 
-            if (status === 'waiting' || status === 'streaming') { 
-                D.messageInput.disabled = true; 
-                D.messageInput.placeholder = 'AI is responding...'; 
-                if (status === 'streaming') { 
-                    D.sendBtn.innerHTML = `<i data-lucide="square" class="h-4 w-4"></i>`; 
-                    D.sendBtn.onclick = () => { 
-                        // Stop any typing animations
-                        Object.keys(state.typingIntervals).forEach(messageId => {
-                            clearInterval(state.typingIntervals[messageId]);
-                            delete state.typingIntervals[messageId];
-                        });
-                        
-                        state.abortController?.abort(); 
-                    }; 
-                    D.sendBtn.title = "Stop Generating"; 
-                } else { 
-                    D.sendBtn.innerHTML = `<div class="spinner"></div>`; 
-                    D.sendBtn.onclick = null; 
-                } 
-                D.sendBtn.disabled = false; 
+            D.messageInput.disabled = (status !== 'idle');
+            D.messageInput.placeholder = (status !== 'idle') ? 'AI is responding...' : 'Message AJ...';
+
+            if (status === 'streaming') { 
+                D.sendBtn.innerHTML = `<i data-lucide="square" class="h-4 w-4"></i>`; 
+                D.sendBtn.onclick = () => state.abortController?.abort(); 
+                D.sendBtn.title = "Stop Generating"; 
+            } else if (status === 'waiting') {
+                D.sendBtn.innerHTML = `<div class="spinner"></div>`;
+                D.sendBtn.onclick = null;
             } else { 
-                D.sendBtn.disabled = false; 
                 D.sendBtn.innerHTML = `<i data-lucide="send" class="h-4 w-4"></i>`; 
                 D.sendBtn.onclick = sendMessage; 
                 D.sendBtn.title = "Send Message"; 
-                D.messageInput.disabled = false; 
-                D.messageInput.placeholder = 'Message AJ...'; 
             } 
+            D.sendBtn.disabled = (status === 'waiting');
             lucide.createIcons(); 
         }
         
@@ -1798,17 +1369,13 @@
         function showToast(message, type = 'info') { 
             const toastContainer = document.getElementById('toastContainer'); 
             const toast = document.createElement('div'); 
-            const colors = { 
-                success: 'bg-green-500', 
-                error: 'bg-red-500', 
-                info: 'bg-blue-500' 
-            }; 
-            toast.className = `toast ${colors[type]} text-white`; 
-            toast.style.cssText = 'background-color:rgb(var(--card));color:rgb(var(--foreground));border:1px solid hsl(var(--border));border-radius:0.5rem;padding:0.75rem 1rem;box-shadow:0 4px 12px rgba(0, 0, 0, 0.05);margin-bottom:0.5rem;animation:slideIn 0.3s ease-out;'; 
+            const typeClasses = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
+            toast.className = `toast text-white py-2 px-4 rounded-lg shadow-lg mb-2 ${typeClasses[type]}`;
             toast.textContent = message; 
             toastContainer.appendChild(toast); 
             setTimeout(() => { 
-                toast.style.opacity = '0'; 
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
                 setTimeout(() => toastContainer.removeChild(toast), 300); 
             }, 3000); 
         }
@@ -1822,39 +1389,26 @@
                 const language = lang || 'text';
                 const decodedCode = code.replace(/<br>/g, '\n');
                 return `</div><div class="code-block" data-code="${escapeHtml(decodedCode)}">
-                    <div class="code-header">
-                        <span>${language}</span>
-                        <button onclick="copyCode(this)">
-                            <i data-lucide="copy" class="h-3 w-3"></i>Copy
-                        </button>
-                    </div>
-                    <div class="code-content">
-                        <pre><code>${decodedCode}</code></pre>
-                    </div>
+                    <div class="code-header"><span>${language}</span><button onclick="copyCode(this)"><i data-lucide="copy" class="h-3 w-3"></i>Copy</button></div>
+                    <div class="code-content"><pre><code>${decodedCode}</code></pre></div>
                 </div><div class="message-content">`;
             });
             html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-            html = html.replace(/^\s*[-*]\s+(.*)$/gm, '<ul><li>$1</li></ul>')
-                       .replace(/<\/ul><br><ul>/g, '');
-            html = html.replace(/^\s*\d+\.\s+(.*)$/gm, '<ol><li>$1</li></ol>')
-                       .replace(/<\/ol><br><ol>/g, '');
+            html = html.replace(/^\s*[-*]\s+(.*)$/gm, '<ul><li>$1</li></ul>').replace(/<\/ul><br><ul>/g, '');
+            html = html.replace(/^\s*(\d+\.)\s+(.*)$/gm, '<ol start="$1"><li>$2</li></ol>').replace(/<\/ol><br><ol>/g, '');
             return html;
         }
         
-        function isScrolledToBottom(el) { 
-            return el.scrollHeight - el.scrollTop - el.clientHeight < 50; 
-        }
+        function scrollToBottom(el) { el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); }
         
-        function scrollToBottom(el, behavior = 'smooth') { 
-            el.scrollTo({ top: el.scrollHeight, behavior: behavior }); 
-        }
+        function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
         
-        function escapeHtml(text) { 
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
-        }
-        
-        function copyMessage(text) { 
-            navigator.clipboard.writeText(text).then(() => showToast('Message copied!', 'success')); 
+        function copyMessage(messageId) { 
+             const chat = state.chats.find(c => c.id === state.selectedChatId);
+             if (!chat) return;
+             const msg = chat.messages.find(m => m.id === messageId);
+             if(!msg) return;
+             navigator.clipboard.writeText(msg.fullText || msg.text).then(() => showToast('Message copied!', 'success')); 
         }
         
         function copyCode(btn) { 
