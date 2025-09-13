@@ -344,6 +344,30 @@
             50% { transform: scale(1.5); opacity: 0.5; }
             100% { transform: scale(1); opacity: 1; }
         }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .input-wrapper {
+                padding: 0 1rem;
+            }
+            
+            .welcome-screen {
+                padding: 1rem;
+            }
+            
+            .welcome-screen h2 {
+                font-size: 2rem;
+            }
+            
+            .example-prompt {
+                padding: 1rem;
+            }
+            
+            .modal {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+            }
+        }
     </style>
 </head>
 <body class="font-sans">
@@ -534,13 +558,13 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 gap-3">
-                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="grok">
+                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="groq">
                             <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
                             <div class="flex-1">
                                 <div class="font-medium">AJ-Fast (Groq)</div>
                                 <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
                             </div>
-                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="grok"></div>
+                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="groq"></div>
                         </button>
                         <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="gemini">
                             <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
@@ -665,7 +689,7 @@
         let state = { 
             chats: [], 
             selectedChatId: null, 
-            currentModel: 'grok', 
+            currentModel: 'groq', 
             chatStatus: 'idle', 
             abortController: null, 
             settings: { ...defaultSettings },
@@ -675,7 +699,7 @@
         };
         const TYPING_SPEEDS = { slow: 40, medium: 20, fast: 5 };
         const MODEL_CONFIGS = {
-            grok: { 
+            groq: { 
                 name: 'AJ-Fast (Groq)', 
                 apiModel: 'llama3-8b-8192', 
                 color: 'from-blue-500 to-purple-600', 
