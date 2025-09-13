@@ -755,8 +755,19 @@
                 sendMessage(); 
             }));
             
-            document.querySelectorAll('.fontSizeBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.fontSizeBtn')));
-            document.querySelectorAll('.typingSpeedBtn').forEach(el => el.addEventListener('click', (e) => setActiveButton(e.currentTarget, '.typingSpeedBtn')));
+            // Font size buttons
+            document.querySelectorAll('.fontSizeBtn').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    setActiveButton(e.currentTarget, '.fontSizeBtn');
+                });
+            });
+            
+            // Typing speed buttons
+            document.querySelectorAll('.typingSpeedBtn').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    setActiveButton(e.currentTarget, '.typingSpeedBtn');
+                });
+            });
             
             // Add model selection listeners
             document.querySelectorAll('.model-option-btn').forEach(btn => {
@@ -1557,6 +1568,7 @@
         }
         
         function openSettingsModal() { 
+            // Set all toggle values
             document.getElementById('darkModeToggle').checked = state.settings.darkMode; 
             document.getElementById('typingToggle').checked = state.settings.typingAnimation; 
             document.getElementById('webSearchToggle').checked = state.settings.webSearch;
@@ -1566,8 +1578,24 @@
             // Show/hide voice button based on voice input setting
             D.voiceBtn.style.display = state.settings.voiceInput ? 'flex' : 'none';
             
-            setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn'); 
-            setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn');
+            // Set active buttons for font size and typing speed
+            document.querySelectorAll('.fontSizeBtn').forEach(btn => {
+                if (btn.dataset.size === state.settings.fontSize) {
+                    setActiveButton(btn, '.fontSizeBtn');
+                } else {
+                    btn.classList.remove('active', 'bg-primary', 'text-primary-foreground');
+                    btn.classList.add('bg-secondary', 'text-secondary-foreground');
+                }
+            });
+            
+            document.querySelectorAll('.typingSpeedBtn').forEach(btn => {
+                if (btn.dataset.speed === state.settings.typingSpeed) {
+                    setActiveButton(btn, '.typingSpeedBtn');
+                } else {
+                    btn.classList.remove('active', 'bg-primary', 'text-primary-foreground');
+                    btn.classList.add('bg-secondary', 'text-secondary-foreground');
+                }
+            });
             
             // Update model selection UI
             updateModelSelectionUI();
@@ -1630,8 +1658,19 @@
             state.settings.webSearch = document.getElementById('webSearchToggle').checked;
             state.settings.imageGeneration = document.getElementById('imageGenToggle').checked;
             state.settings.voiceInput = document.getElementById('voiceInputToggle').checked;
-            state.settings.fontSize = document.querySelector('.fontSizeBtn.active').dataset.size; 
-            state.settings.typingSpeed = document.querySelector('.typingSpeedBtn.active').dataset.speed; 
+            
+            // Get the active font size button
+            const activeFontSizeBtn = document.querySelector('.fontSizeBtn.active');
+            if (activeFontSizeBtn) {
+                state.settings.fontSize = activeFontSizeBtn.dataset.size;
+            }
+            
+            // Get the active typing speed button
+            const activeTypingSpeedBtn = document.querySelector('.typingSpeedBtn.active');
+            if (activeTypingSpeedBtn) {
+                state.settings.typingSpeed = activeTypingSpeedBtn.dataset.speed;
+            }
+            
             applySettings(); 
             saveState(); 
             D.settingsModal.classList.add('hidden'); 
