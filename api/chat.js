@@ -1,4 +1,3 @@
-// api/chat.js
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== "POST") {
@@ -35,7 +34,7 @@ export default async function handler(req, res) {
       headers.Authorization = `Bearer ${GROQ_API_KEY}`;
       
       body = {
-        model: "llama3-3-70b-versatile",
+        model: "llama3-70b-8192",
         messages: messages.map(m => ({
           role: m.role || (m.sender === "ai" ? "assistant" : "user"),
           content: m.content || m.text
@@ -104,6 +103,50 @@ export default async function handler(req, res) {
             role: 'system',
             content: 'You are AJ, an advanced AI assistant created by AJ STUDIOZ. Provide helpful, accurate, and insightful responses.'
           });
+        }
+        
+        // Check if we need to perform web search
+        const lastMessage = messages[messages.length - 1];
+        const userMessage = lastMessage?.content || lastMessage?.text || '';
+        
+        if (shouldPerformWebSearch(userMessage)) {
+          try {
+            console.log("Performing web search for:", userMessage);
+            const searchResults = await performWebSearch(zai, userMessage);
+            
+            if (searchResults && searchResults.length > 0) {
+              // Add web search context to the system message
+              const searchContext = searchResults.slice(0, 3).map((result) => 
+                `- ${result.name}: ${result.snippet}`
+              ).join('\n');
+              
+              formattedMessages[0].content += `\n\nRecent web search results for context:\n${searchContext}`;
+            }
+          } catch (searchError) {
+            console.error('Web search error:', searchError);
+          }
+        }
+        
+        // Check if we need to generate an image
+        if (shouldGenerateImage(userMessage)) {
+          try {
+            const imagePrompt = extractImagePrompt(userMessage);
+            if (imagePrompt) {
+              console.log("Generating image for prompt:", imagePrompt);
+              const imageData = await generateImage(zai, imagePrompt);
+              
+              if (imageData) {
+                // Add image generation note to the response
+                return res.status(200).json({ 
+                  response: `I've generated an image based on your request. Here's what I created for "${imagePrompt}":\n\n[Image generated: ${imagePrompt}]\n\n${imageData ? 'The image has been generated successfully.' : 'Image generation failed.'}`,
+                  imageData: imageData,
+                  imagePrompt: imagePrompt
+                });
+              }
+            }
+          } catch (imageError) {
+            console.error('Image generation error:', imageError);
+          }
         }
         
         console.log("Calling Z-AI SDK with messages:", formattedMessages);
@@ -177,5 +220,75 @@ export default async function handler(req, res) {
       error: "Server error",
       details: err.message
     });
+  }
+}
+
+// Helper functions
+function shouldPerformWebSearch(message) {
+  const webSearchKeywords = [
+    'latest', 'recent', 'current', 'today', 'yesterday', 'news', 'update',
+    'what is happening', 'what happened', 'weather', 'stock price', 'score',
+    'who won', 'election', 'sports', 'market', 'price', 'trending'
+  ];
+  
+  const lowerMessage = message.toLowerCase();
+  return webSearchKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
+async function performWebSearch(zai, query) {
+  try {
+    const searchResult = await zai.functions.invoke("web_search", {
+      query: query,
+      num: 5
+    });
+    
+    return searchResult || [];
+  } catch (error) {
+    console.error('Web search error:', error);
+    return [];
+  }
+}
+
+function shouldGenerateImage(message) {
+  const imageKeywords = [
+    'generate', 'create', 'draw', 'make', 'show me', 'image of', 'picture of',
+    'visualize', 'illustration', 'art', 'design', 'painting', 'photo'
+  ];
+  
+  const lowerMessage = message.toLowerCase();
+  return imageKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
+function extractImagePrompt(message) {
+  const patterns = [
+    /generate (an? )?image of (.+)/i,
+    /create (an? )?(picture|image|art) of (.+)/i,
+    /draw (.+)/i,
+    /show me (an? )?image of (.+)/i,
+    /make (an? )?(visual|illustration) of (.+)/i
+  ];
+  
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (match) {
+      return match[2] || match[1] || match[3];
+    }
+  }
+  
+  // If no pattern matches, use the whole message as the prompt
+  return message;
+}
+
+async function generateImage(zai, prompt) {
+  try {
+    const response = await zai.images.generations.create({
+      prompt: prompt,
+      size: '1024x1024'
+    });
+    
+    return response.data[0]?.base64 || null;
+  } catch (error) {
+    console.error('Image generation error:', error);
+    return null;
   }
 }
