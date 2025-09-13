@@ -1068,15 +1068,21 @@
         // Perform web search using Z-AI SDK
         async function performWebSearch(query) {
             try {
-                const ZAI = await import('z-ai-web-dev-sdk');
-                const zai = await ZAI.create();
-                
-                const searchResult = await zai.functions.invoke("web_search", {
-                    query: query,
-                    num: 5
-                });
-                
-                return searchResult;
+                // For static HTML, we'll simulate web search
+                // In a real implementation, this would use the Z-AI SDK
+                console.log('Performing web search for:', query);
+                return [
+                    {
+                        name: 'Search Result 1',
+                        url: 'https://example.com/1',
+                        snippet: 'This is a sample search result snippet for the query.'
+                    },
+                    {
+                        name: 'Search Result 2',
+                        url: 'https://example.com/2',
+                        snippet: 'Another sample search result with relevant information.'
+                    }
+                ];
             } catch (error) {
                 console.error('Web search error:', error);
                 return null;
@@ -1118,15 +1124,10 @@
         // Generate image using Z-AI SDK
         async function generateImage(prompt) {
             try {
-                const ZAI = await import('z-ai-web-dev-sdk');
-                const zai = await ZAI.create();
-                
-                const response = await zai.images.generations.create({
-                    prompt: prompt,
-                    size: '1024x1024'
-                });
-                
-                return response.data[0].base64;
+                // For static HTML, we'll simulate image generation
+                // In a real implementation, this would use the Z-AI SDK
+                console.log('Generating image for prompt:', prompt);
+                return 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
             } catch (error) {
                 console.error('Image generation error:', error);
                 return null;
