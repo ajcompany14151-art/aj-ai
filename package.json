@@ -5,8 +5,30 @@
   "main": "index.html",
   "scripts": {
     "dev": "python3 -m http.server 8000",
-    "start": "python3 -m http.server 8000"
+    "start": "python3 -m http.server 8000",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "vercel --prod"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "keywords": [
+    "ai",
+    "assistant",
+    "chat",
+    "groq",
+    "gemini",
+    "z-ai",
+    "vercel"
+  ],
+  "author": "AJ STUDIOZ",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/aj-ai-assistant"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/aj-ai-assistant/issues"
+  },
+  "homepage": "https://github.com/yourusername/aj-ai-assistant#readme",
+  "devDependencies": {
+    "vercel": "^32.4.1"
+  }
 }
