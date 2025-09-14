@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AJ - AI Assistant by AJ STUDIOZ</title>
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzNEODJGRiIgLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojOUI0NkZGIiAvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjx0ZXh0IHg9IjE2IiB5PSIyMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPkFKPC90ZXh0Pgo8L3N2Zz4K" type="image/svg+xml">
+    <!-- Updated favicon with the provided image -->
+    <link rel="icon" href="https://z-cdn-media.chatglm.cn/files/c32d0305-6191-4efa-8fa0-2fc21769cdc5_favicon.png?auth_key=1789388559-c7c532dc96654b6397d49d68beb4e472-0-f12d933b7764476ba4a5572169f5ec4d" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -368,18 +369,596 @@
                 max-width: calc(100vw - 2rem);
             }
         }
+        
+        /* ChatGPT-like splash screen */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #171717 0%, #2d2d2d 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        .chatgpt-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .chatgpt-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #10a37f, #10a37f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .chatgpt-subtitle {
+            font-size: 1.2rem;
+            color: #e5e5e5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* Login/Registration styles */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .auth-container {
+            background-color: rgb(var(--card));
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            padding: 2rem;
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-subtitle {
+            color: rgb(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-input {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            background-color: rgb(var(--input));
+            color: rgb(var(--foreground));
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .auth-input:focus {
+            outline: none;
+            border-color: rgb(var(--primary));
+            box-shadow: 0 0 0 3px rgba(var(--primary), 0.1);
+        }
+        
+        .auth-button {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background-color: rgb(var(--primary));
+            color: rgb(var(--primary-foreground));
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .auth-button:hover {
+            background-color: rgba(var(--primary), 0.9);
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            gap: 1rem;
+        }
+        
+        .auth-divider-line {
+            flex: 1;
+            height: 1px;
+            background-color: hsl(var(--border));
+        }
+        
+        .auth-divider-text {
+            color: rgb(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+        
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .social-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid hsl(var(--border));
+            background-color: transparent;
+            color: rgb(var(--foreground));
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .social-button:hover {
+            background-color: rgb(var(--accent));
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: rgb(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+        
+        .auth-toggle a {
+            color: rgb(var(--primary));
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+        
+        /* User profile dropdown */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: transparent;
+            color: rgb(var(--foreground));
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .user-button:hover {
+            background-color: rgb(var(--accent));
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgb(var(--primary));
+            color: rgb(var(--primary-foreground));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background-color: rgb(var(--card));
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid hsl(var(--border));
+            min-width: 200px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: rgb(var(--foreground));
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .user-menu-item:hover {
+            background-color: rgb(var(--accent));
+        }
+        
+        .user-menu-divider {
+            height: 1px;
+            background-color: hsl(var(--border));
+            margin: 0.5rem 0;
+        }
+        
+        /* Premium features */
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: linear-gradient(90deg, #f59e0b, #f97316);
+            color: white;
+        }
+        
+        .premium-features {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .premium-features h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f59e0b;
+        }
+        
+        .premium-feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .premium-feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .premium-feature-icon {
+            color: #f59e0b;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        
+        .upgrade-button {
+            background: linear-gradient(90deg, #f59e0b, #f97316);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+        
+        .upgrade-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        
+        /* ChatGPT-like header */
+        .chatgpt-header {
+            background: linear-gradient(to right, rgba(16, 163, 127, 0.1), rgba(16, 163, 127, 0.05));
+            border-bottom: 1px solid rgba(16, 163, 127, 0.2);
+        }
+        
+        .dark .chatgpt-header {
+            background: linear-gradient(to right, rgba(16, 163, 127, 0.1), rgba(16, 163, 127, 0.05));
+            border-bottom: 1px solid rgba(16, 163, 127, 0.2);
+        }
+        
+        /* ChatGPT-like input area */
+        .chatgpt-input {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark .chatgpt-input {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ChatGPT-like message bubbles */
+        .chatgpt-message {
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* ChatGPT-like sidebar */
+        .chatgpt-sidebar {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark .chatgpt-sidebar {
+            background: linear-gradient(to bottom, rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.8));
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Feature card */
+        .feature-card {
+            background-color: rgb(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgba(var(--primary), 0.8) 100%);
+            color: rgb(var(--primary-foreground));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .feature-description {
+            color: rgb(var(--muted-foreground));
+            margin-bottom: 1rem;
+        }
+        
+        .feature-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgb(var(--primary));
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .feature-action:hover {
+            gap: 0.75rem;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: rgb(var(--destructive));
+            color: rgb(var(--destructive-foreground));
+            font-size: 0.625rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Tab navigation */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid hsl(var(--border));
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: rgb(var(--muted-foreground));
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-button:hover {
+            color: rgb(var(--foreground));
+        }
+        
+        .tab-button.active {
+            color: rgb(var(--primary));
+            border-bottom-color: rgb(var(--primary));
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="font-sans">
+    <!-- ChatGPT-like Splash Screen -->
+    <div id="splashScreen">
+        <img src="https://z-cdn-media.chatglm.cn/files/c32d0305-6191-4efa-8fa0-2fc21769cdc5_favicon.png?auth_key=1789388559-c7c532dc96654b6397d49d68beb4e472-0-f12d933b7764476ba4a5572169f5ec4d" alt="AJ Logo" class="chatgpt-logo">
+        <h1 class="chatgpt-title">AI Assistant</h1>
+        <p class="chatgpt-subtitle">by AJ STUDIOZ</p>
+        <div class="loading-dots mt-6">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="auth-modal hidden">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 class="auth-title">Welcome back</h2>
+                <p class="auth-subtitle">Sign in to your account to continue</p>
+            </div>
+            <form class="auth-form" id="loginForm">
+                <input type="email" class="auth-input" placeholder="Email address" required>
+                <input type="password" class="auth-input" placeholder="Password" required>
+                <button type="submit" class="auth-button">Sign In</button>
+            </form>
+            <div class="auth-divider">
+                <div class="auth-divider-line"></div>
+                <div class="auth-divider-text">OR</div>
+                <div class="auth-divider-line"></div>
+            </div>
+            <div class="social-login">
+                <button class="social-button" id="googleLogin">
+                    <i data-lucide="chrome" class="h-4 w-4"></i>
+                    Continue with Google
+                </button>
+                <button class="social-button" id="githubLogin">
+                    <i data-lucide="github" class="h-4 w-4"></i>
+                    Continue with GitHub
+                </button>
+                <button class="social-button" id="microsoftLogin">
+                    <i data-lucide="briefcase" class="h-4 w-4"></i>
+                    Continue with Microsoft
+                </button>
+            </div>
+            <div class="auth-toggle">
+                Don't have an account? <a href="#" id="showRegister">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="registerModal" class="auth-modal hidden">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2 class="auth-title">Create an account</h2>
+                <p class="auth-subtitle">Get started with AI Assistant today</p>
+            </div>
+            <form class="auth-form" id="registerForm">
+                <input type="text" class="auth-input" placeholder="Full name" required>
+                <input type="email" class="auth-input" placeholder="Email address" required>
+                <input type="password" class="auth-input" placeholder="Password" required>
+                <input type="password" class="auth-input" placeholder="Confirm password" required>
+                <button type="submit" class="auth-button">Create Account</button>
+            </form>
+            <div class="auth-divider">
+                <div class="auth-divider-line"></div>
+                <div class="auth-divider-text">OR</div>
+                <div class="auth-divider-line"></div>
+            </div>
+            <div class="social-login">
+                <button class="social-button" id="googleRegister">
+                    <i data-lucide="chrome" class="h-4 w-4"></i>
+                    Continue with Google
+                </button>
+                <button class="social-button" id="githubRegister">
+                    <i data-lucide="github" class="h-4 w-4"></i>
+                    Continue with GitHub
+                </button>
+                <button class="social-button" id="microsoftRegister">
+                    <i data-lucide="briefcase" class="h-4 w-4"></i>
+                    Continue with Microsoft
+                </button>
+            </div>
+            <div class="auth-toggle">
+                Already have an account? <a href="#" id="showLogin">Sign in</a>
+            </div>
+        </div>
+    </div>
+
     <div id="app">
         <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-        <div id="sidebar" class="sidebar">
+        <div id="sidebar" class="sidebar chatgpt-sidebar">
             <div class="sidebar-header p-4 border-b border-border">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">AJ</div>
-                    <div>
-                        <h2 class="text-xl font-bold">AI Assistant</h2>
-                        <p class="text-xs text-muted-foreground">by AJ STUDIOZ</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">AJ</div>
+                        <div>
+                            <h2 class="text-xl font-bold">AI Assistant</h2>
+                            <p class="text-xs text-muted-foreground">by AJ STUDIOZ</p>
+                        </div>
+                    </div>
+                    <div class="user-dropdown">
+                        <button class="user-button" id="userMenuButton">
+                            <div class="user-avatar" id="userAvatar">U</div>
+                            <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                        </button>
+                        <div class="user-menu hidden" id="userMenu">
+                            <a href="#" class="user-menu-item" id="profileMenuItem">
+                                <i data-lucide="user" class="h-4 w-4"></i>
+                                Profile
+                            </a>
+                            <a href="#" class="user-menu-item" id="settingsMenuItem">
+                                <i data-lucide="settings" class="h-4 w-4"></i>
+                                Settings
+                            </a>
+                            <div class="user-menu-divider"></div>
+                            <a href="#" class="user-menu-item" id="upgradeMenuItem">
+                                <i data-lucide="star" class="h-4 w-4"></i>
+                                Upgrade to Premium
+                            </a>
+                            <div class="user-menu-divider"></div>
+                            <a href="#" class="user-menu-item" id="logoutMenuItem">
+                                <i data-lucide="log-out" class="h-4 w-4"></i>
+                                Log out
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -397,23 +976,28 @@
                 </div>
             </div>
             <div class="sidebar-footer p-4 border-t border-border">
-                <div class="ai-info-card" style="background-color:rgb(var(--muted));border-radius:0.75rem;padding:1rem;margin-bottom:1rem;border:1px solid hsl(var(--border));">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">AJ</div>
-                        <div>
-                            <h3 class="font-semibold">AI Assistant</h3>
-                            <p class="text-xs text-muted-foreground">Created by AJ STUDIOZ</p>
+                <div class="premium-features">
+                    <h3>Upgrade to Premium</h3>
+                    <div class="premium-feature-list">
+                        <div class="premium-feature-item">
+                            <i data-lucide="zap" class="premium-feature-icon h-4 w-4"></i>
+                            <div>Faster response times</div>
+                        </div>
+                        <div class="premium-feature-item">
+                            <i data-lucide="image" class="premium-feature-icon h-4 w-4"></i>
+                            <div>Image generation</div>
+                        </div>
+                        <div class="premium-feature-item">
+                            <i data-lucide="file-text" class="premium-feature-icon h-4 w-4"></i>
+                            <div>Advanced document analysis</div>
                         </div>
                     </div>
-                    <p class="text-xs text-muted-foreground">AJ is an advanced AI assistant designed to help with a wide range of tasks, from answering questions to generating creative content.</p>
+                    <button class="upgrade-button" id="upgradeButton">Upgrade Now</button>
                 </div>
-                <button id="settingsBtn" class="w-full py-2 px-4 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors flex items-center justify-center gap-2 font-medium">
-                    <i data-lucide="settings" class="h-4 w-4"></i>Settings
-                </button>
             </div>
         </div>
         <div class="main-content">
-            <header class="border-b border-border bg-background/95 backdrop-blur flex-shrink-0">
+            <header class="border-b border-border bg-background/95 backdrop-blur flex-shrink-0 chatgpt-header">
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center gap-4">
                         <button id="mobileMenuBtn" class="md:hidden p-2 hover:bg-accent rounded-lg transition-colors">
@@ -431,6 +1015,12 @@
                         <button id="clearBtn" class="p-2 hover:bg-accent rounded-lg transition-colors" title="Clear Chat">
                             <i data-lucide="trash-2" class="h-4 w-4"></i>
                         </button>
+                        <div class="relative">
+                            <button id="notificationBtn" class="p-2 hover:bg-accent rounded-lg transition-colors" title="Notifications">
+                                <i data-lucide="bell" class="h-4 w-4"></i>
+                            </button>
+                            <div class="notification-badge">3</div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -439,7 +1029,7 @@
                     <div id="welcomeScreen" class="welcome-screen text-center py-12">
                         <div class="mb-12">
                             <div class="flex items-center justify-center gap-4 mb-8">
-                                <div class="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 flex items-center justify-center text-white font-bold shadow-2xl text-3xl animate-pulse">AJ</div>
+                                <div class="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 flex items-center justify-center text-white font-bold shadow-2xl text-3xl floating">AJ</div>
                                 <div class="text-left">
                                     <h2 class="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">AI Assistant</h2>
                                     <p class="text-muted-foreground text-lg mt-2">Powered by Advanced AI</p>
@@ -509,7 +1099,7 @@
                     <div id="messagesContainer" class="space-y-4 hidden"></div>
                 </div>
             </div>
-            <div class="input-area">
+            <div class="input-area chatgpt-input">
                 <div id="voiceRecording" class="voice-recording hidden">
                     <div class="voice-recording-indicator"></div>
                     <span>Listening...</span>
@@ -546,119 +1136,170 @@
                 </button>
             </div>
             <div class="p-6 space-y-8 max-h-96 overflow-y-auto">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="font-medium text-lg">AI Model</h4>
-                            <p class="text-sm text-muted-foreground">Choose your preferred AI assistant</p>
+                <div class="tab-nav">
+                    <button class="tab-button active" data-tab="general">General</button>
+                    <button class="tab-button" data-tab="model">AI Model</button>
+                    <button class="tab-button" data-tab="appearance">Appearance</button>
+                </div>
+                
+                <div class="tab-content active" id="general-tab">
+                    <div class="space-y-6">
+                        <h4 class="font-medium text-lg">General Settings</h4>
+                        
+                        <div class="feature-toggle">
+                            <div>
+                                <div class="feature-toggle-label">Save Chat History</div>
+                                <div class="feature-toggle-description">Store your conversation history for future reference</div>
+                            </div>
+                            <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                <input type="checkbox" id="saveHistoryToggle" checked>
+                                <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                            </label>
                         </div>
-                        <div class="text-sm text-muted-foreground">
-                            Current: <span id="currentModelDisplay" class="font-medium text-primary">AJ-Fast</span>
+                        
+                        <div class="feature-toggle">
+                            <div>
+                                <div class="feature-toggle-label">Auto-save Drafts</div>
+                                <div class="feature-toggle-description">Automatically save unsent messages</div>
+                            </div>
+                            <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                <input type="checkbox" id="autoSaveToggle" checked>
+                                <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                            </label>
                         </div>
-                    </div>
-                    <div class="grid grid-cols-1 gap-3">
-                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="groq">
-                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
-                            <div class="flex-1">
-                                <div class="font-medium">AJ-Fast (Groq)</div>
-                                <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
+                        
+                        <div class="feature-toggle">
+                            <div>
+                                <div class="feature-toggle-label">Email Notifications</div>
+                                <div class="feature-toggle-description">Receive email updates about your account</div>
                             </div>
-                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="groq"></div>
-                        </button>
-                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="gemini">
-                            <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
-                            <div class="flex-1">
-                                <div class="font-medium">AJ-Creative (Gemini)</div>
-                                <div class="text-sm text-muted-foreground">Enhanced creativity and reasoning</div>
-                            </div>
-                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="gemini"></div>
-                        </button>
-                        <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="zai">
-                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
-                            <div class="flex-1">
-                                <div class="font-medium">AJ-Advanced (Z-AI)</div>
-                                <div class="text-sm text-muted-foreground">Advanced capabilities with web search</div>
-                            </div>
-                            <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="zai"></div>
-                        </button>
+                            <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                <input type="checkbox" id="emailNotificationsToggle">
+                                <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="border-t border-border pt-6"></div>
-                <div class="space-y-6">
-                    <h4 class="font-medium text-lg">Advanced Features</h4>
-                    
-                    <div class="feature-toggle">
-                        <div>
-                            <div class="feature-toggle-label">Web Search</div>
-                            <div class="feature-toggle-description">Enable AI to search the web for current information</div>
+                
+                <div class="tab-content" id="model-tab">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-medium text-lg">AI Model</h4>
+                                <p class="text-sm text-muted-foreground">Choose your preferred AI assistant</p>
+                            </div>
+                            <div class="text-sm text-muted-foreground">
+                                Current: <span id="currentModelDisplay" class="font-medium text-primary">AJ-Fast</span>
+                            </div>
                         </div>
-                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                            <input type="checkbox" id="webSearchToggle">
-                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="feature-toggle">
-                        <div>
-                            <div class="feature-toggle-label">Image Generation</div>
-                            <div class="feature-toggle-description">Allow AI to generate images based on descriptions</div>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="groq">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                                <div class="flex-1">
+                                    <div class="font-medium">AJ-Fast (Groq)</div>
+                                    <div class="text-sm text-muted-foreground">Fast and efficient for most tasks</div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="groq"></div>
+                            </button>
+                            <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="gemini">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                                <div class="flex-1">
+                                    <div class="font-medium">AJ-Creative (Gemini)</div>
+                                    <div class="text-sm text-muted-foreground">Enhanced creativity and reasoning</div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="gemini"></div>
+                            </button>
+                            <button class="model-option-btn w-full p-4 rounded-xl hover:bg-accent transition-all duration-300 flex items-center gap-4 text-left border-2 border-transparent hover:border-primary/20" data-model="zai">
+                                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">AJ</div>
+                                <div class="flex-1">
+                                    <div class="font-medium">AJ-Advanced (Z-AI)</div>
+                                    <div class="text-sm text-muted-foreground">Advanced capabilities with web search</div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-muted-foreground/30 model-radio" data-model="zai"></div>
+                            </button>
                         </div>
-                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                            <input type="checkbox" id="imageGenToggle">
-                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="feature-toggle">
-                        <div>
-                            <div class="feature-toggle-label">Voice Input</div>
-                            <div class="feature-toggle-description">Use your voice to send messages</div>
+                        
+                        <div class="border-t border-border pt-6"></div>
+                        <div class="space-y-6">
+                            <h4 class="font-medium text-lg">Advanced Features</h4>
+                            
+                            <div class="feature-toggle">
+                                <div>
+                                    <div class="feature-toggle-label">Web Search</div>
+                                    <div class="feature-toggle-description">Enable AI to search the web for current information</div>
+                                </div>
+                                <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                    <input type="checkbox" id="webSearchToggle">
+                                    <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="feature-toggle">
+                                <div>
+                                    <div class="feature-toggle-label">Image Generation</div>
+                                    <div class="feature-toggle-description">Allow AI to generate images based on descriptions</div>
+                                </div>
+                                <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                    <input type="checkbox" id="imageGenToggle">
+                                    <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="feature-toggle">
+                                <div>
+                                    <div class="feature-toggle-label">Voice Input</div>
+                                    <div class="feature-toggle-description">Use your voice to send messages</div>
+                                </div>
+                                <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                    <input type="checkbox" id="voiceInputToggle">
+                                    <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                                </label>
+                            </div>
                         </div>
-                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                            <input type="checkbox" id="voiceInputToggle">
-                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                        </label>
                     </div>
                 </div>
-                <div class="border-t border-border pt-6"></div>
-                <div class="space-y-6">
-                    <h4 class="font-medium text-lg">Appearance</h4>
-                    
-                    <div class="flex items-center justify-between">
-                        <label for="darkModeToggle" class="font-medium">Dark Mode</label>
-                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                            <input type="checkbox" id="darkModeToggle">
-                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <label for="typingToggle" class="font-medium">Typing Animation</label>
-                        <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
-                            <input type="checkbox" id="typingToggle" checked>
-                            <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="border-t border-border pt-6"></div>
-                <div class="space-y-6">
-                    <h4 class="font-medium text-lg">Text Settings</h4>
-                    
-                    <div class="space-y-3">
-                        <label class="font-medium">Font Size</label>
-                        <div class="flex gap-2">
-                            <button class="fontSizeBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-size="small">Small</button>
-                            <button class="fontSizeBtn w-full py-2.5" data-size="medium">Medium</button>
-                            <button class="fontSizeBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-size="large">Large</button>
+                
+                <div class="tab-content" id="appearance-tab">
+                    <div class="space-y-6">
+                        <h4 class="font-medium text-lg">Appearance</h4>
+                        
+                        <div class="flex items-center justify-between">
+                            <label for="darkModeToggle" class="font-medium">Dark Mode</label>
+                            <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                <input type="checkbox" id="darkModeToggle">
+                                <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                            </label>
                         </div>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <label class="font-medium">Typing Speed</label>
-                        <div class="flex gap-2">
-                            <button class="typingSpeedBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-speed="slow">Slow</button>
-                            <button class="typingSpeedBtn w-full py-2.5" data-speed="medium">Medium</button>
-                            <button class="typingSpeedBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-speed="fast">Fast</button>
+                        
+                        <div class="flex items-center justify-between">
+                            <label for="typingToggle" class="font-medium">Typing Animation</label>
+                            <label class="toggle-switch" style="position:relative;display:inline-block;width:48px;height:24px;">
+                                <input type="checkbox" id="typingToggle" checked>
+                                <span class="toggle-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgb(var(--muted));transition:.3s;border-radius:24px;"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="border-t border-border pt-6"></div>
+                        <div class="space-y-6">
+                            <h4 class="font-medium text-lg">Text Settings</h4>
+                            
+                            <div class="space-y-3">
+                                <label class="font-medium">Font Size</label>
+                                <div class="flex gap-2">
+                                    <button class="fontSizeBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-size="small">Small</button>
+                                    <button class="fontSizeBtn w-full py-2.5" data-size="medium">Medium</button>
+                                    <button class="fontSizeBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-size="large">Large</button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <label class="font-medium">Typing Speed</label>
+                                <div class="flex gap-2">
+                                    <button class="typingSpeedBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-speed="slow">Slow</button>
+                                    <button class="typingSpeedBtn w-full py-2.5" data-speed="medium">Medium</button>
+                                    <button class="typingSpeedBtn w-full py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors" data-speed="fast">Fast</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -669,6 +1310,67 @@
             </div>
         </div>
     </div>
+    
+    <!-- Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="modal" style="background-color:rgb(var(--card));border:1px solid hsl(var(--border));border-radius:1rem;box-shadow:0 20px 50px rgba(0, 0, 0, 0.2);max-width:32rem;width:90%;margin:0 auto;">
+            <div class="p-6 border-b border-border flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-semibold">Your Profile</h3>
+                    <p class="text-sm text-muted-foreground">Manage your account information</p>
+                </div>
+                <button id="closeProfileBtn" class="p-2 hover:bg-accent rounded-lg transition-colors">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl mb-4" id="profileAvatar">U</div>
+                    <h4 class="text-lg font-semibold" id="profileName">User Name</h4>
+                    <p class="text-sm text-muted-foreground" id="profileEmail">user@example.com</p>
+                    <button class="mt-4 text-sm text-primary font-medium">Change Profile Picture</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Full Name</label>
+                        <input type="text" class="w-full p-3 bg-input border border-border rounded-lg" id="profileNameInput" value="User Name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Email Address</label>
+                        <input type="email" class="w-full p-3 bg-input border border-border rounded-lg" id="profileEmailInput" value="user@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Bio</label>
+                        <textarea class="w-full p-3 bg-input border border-border rounded-lg" rows="3" id="profileBioInput">I love using AI Assistant!</textarea>
+                    </div>
+                </div>
+                
+                <div class="border-t border-border pt-4">
+                    <h4 class="font-medium mb-3">Account Information</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Member Since</span>
+                            <span>January 2023</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Account Type</span>
+                            <span class="premium-badge">Free</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">API Calls Used</span>
+                            <span>1,247 / 10,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-border flex gap-3">
+                <button id="cancelProfileBtn" class="w-full py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors font-medium">Cancel</button>
+                <button id="saveProfileBtn" class="w-full py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50"></div>
     
     <script>
@@ -680,9 +1382,22 @@
             typingSpeed: 'medium',
             webSearch: false,
             imageGeneration: false,
-            voiceInput: false
+            voiceInput: false,
+            saveHistory: true,
+            autoSave: true,
+            emailNotifications: false
         };
         let state = { 
+            user: {
+                isLoggedIn: false,
+                name: "User Name",
+                email: "user@example.com",
+                avatar: "U",
+                isPremium: false,
+                memberSince: "January 2023",
+                apiCallsUsed: 1247,
+                apiCallsLimit: 10000
+            },
             chats: [], 
             selectedChatId: null, 
             currentModel: 'groq', 
@@ -713,7 +1428,7 @@
             },
             zai: { 
                 name: 'AJ-Advanced (Z-AI)', 
-                apiModel: 'gemini-1.5-pro', // Using a more powerful model for "Advanced"
+                apiModel: 'gpt-3.5-turbo', // Using OpenAI model for Z-AI
                 color: 'from-green-500 to-teal-600', 
                 icon: 'AJ', 
                 endpoint: '/api/chat',
@@ -733,16 +1448,38 @@
             sidebarOverlay: document.getElementById('sidebarOverlay'),
             voiceRecording: document.getElementById('voiceRecording'),
             voiceBtn: document.getElementById('voiceBtn'),
-            stopVoiceBtn: document.getElementById('stopVoiceBtn')
+            stopVoiceBtn: document.getElementById('stopVoiceBtn'),
+            splashScreen: document.getElementById('splashScreen'),
+            loginModal: document.getElementById('loginModal'),
+            registerModal: document.getElementById('registerModal'),
+            profileModal: document.getElementById('profileModal'),
+            userMenu: document.getElementById('userMenu'),
+            userMenuButton: document.getElementById('userMenuButton'),
+            userAvatar: document.getElementById('userAvatar'),
+            profileAvatar: document.getElementById('profileAvatar'),
+            profileName: document.getElementById('profileName'),
+            profileEmail: document.getElementById('profileEmail'),
+            profileNameInput: document.getElementById('profileNameInput'),
+            profileEmailInput: document.getElementById('profileEmailInput'),
+            profileBioInput: document.getElementById('profileBioInput')
         };
         
         document.addEventListener('DOMContentLoaded', () => {
+            // Hide splash screen after 3 seconds with flashing and glowing effect
+            setTimeout(() => {
+                D.splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    D.splashScreen.style.display = 'none';
+                }, 500);
+            }, 3000);
+            
             lucide.createIcons();
             loadState();
             applySettings();
             initializeEventListeners();
             initializeVoiceRecognition();
             selectChat(state.selectedChatId || state.chats[0]?.id || createNewChat(false));
+            updateUserUI();
         });
         
         function initializeEventListeners() {
@@ -755,6 +1492,56 @@
             document.getElementById('closeSettingsBtn').addEventListener('click', () => D.settingsModal.classList.add('hidden'));
             document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
             document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+            
+            // Auth event listeners
+            document.getElementById('showLogin').addEventListener('click', (e) => {
+                e.preventDefault();
+                D.registerModal.classList.add('hidden');
+                D.loginModal.classList.remove('hidden');
+            });
+            
+            document.getElementById('showRegister').addEventListener('click', (e) => {
+                e.preventDefault();
+                D.loginModal.classList.add('hidden');
+                D.registerModal.classList.remove('hidden');
+            });
+            
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            
+            // Social login buttons
+            document.getElementById('googleLogin').addEventListener('click', () => handleSocialLogin('Google'));
+            document.getElementById('githubLogin').addEventListener('click', () => handleSocialLogin('GitHub'));
+            document.getElementById('microsoftLogin').addEventListener('click', () => handleSocialLogin('Microsoft'));
+            
+            document.getElementById('googleRegister').addEventListener('click', () => handleSocialRegister('Google'));
+            document.getElementById('githubRegister').addEventListener('click', () => handleSocialRegister('GitHub'));
+            document.getElementById('microsoftRegister').addEventListener('click', () => handleSocialRegister('Microsoft'));
+            
+            // User menu
+            D.userMenuButton.addEventListener('click', toggleUserMenu);
+            document.getElementById('profileMenuItem').addEventListener('click', openProfileModal);
+            document.getElementById('settingsMenuItem').addEventListener('click', openSettingsModal);
+            document.getElementById('upgradeMenuItem').addEventListener('click', () => {
+                showToast('Upgrade to Premium coming soon!', 'info');
+                closeUserMenu();
+            });
+            document.getElementById('logoutMenuItem').addEventListener('click', handleLogout);
+            
+            // Profile modal
+            document.getElementById('closeProfileBtn').addEventListener('click', () => D.profileModal.classList.add('hidden'));
+            document.getElementById('cancelProfileBtn').addEventListener('click', () => D.profileModal.classList.add('hidden'));
+            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+            
+            // Upgrade button
+            document.getElementById('upgradeButton').addEventListener('click', () => {
+                showToast('Upgrade to Premium coming soon!', 'info');
+            });
+            
+            // Notification button
+            document.getElementById('notificationBtn').addEventListener('click', () => {
+                showToast('You have 3 new notifications', 'info');
+            });
             
             D.messageInput.addEventListener('keydown', handleInputKeydown);
             D.messageInput.addEventListener('input', () => { 
@@ -795,6 +1582,158 @@
                     const model = e.currentTarget.dataset.model;
                     selectModelInSettings(model);
                 });
+            });
+            
+            // Tab navigation
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tabId = e.currentTarget.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
+            
+            // Close modals when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!D.userMenuButton.contains(e.target) && !D.userMenu.contains(e.target)) {
+                    closeUserMenu();
+                }
+            });
+        }
+        
+        // Authentication functions
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            
+            // Simulate login - in a real app, this would be an API call
+            state.user.isLoggedIn = true;
+            state.user.email = email;
+            state.user.name = email.split('@')[0];
+            state.user.avatar = state.user.name.charAt(0).toUpperCase();
+            
+            updateUserUI();
+            D.loginModal.classList.add('hidden');
+            showToast('Login successful!', 'success');
+            saveState();
+        }
+        
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = e.target.querySelector('input[type="text"]').value;
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            const confirmPassword = e.target.querySelectorAll('input[type="password"]')[1].value;
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            // Simulate registration - in a real app, this would be an API call
+            state.user.isLoggedIn = true;
+            state.user.name = name;
+            state.user.email = email;
+            state.user.avatar = name.charAt(0).toUpperCase();
+            
+            updateUserUI();
+            D.registerModal.classList.add('hidden');
+            showToast('Registration successful!', 'success');
+            saveState();
+        }
+        
+        function handleSocialLogin(provider) {
+            // Simulate social login - in a real app, this would redirect to the OAuth provider
+            state.user.isLoggedIn = true;
+            state.user.name = `${provider} User`;
+            state.user.email = `user@${provider.toLowerCase()}.com`;
+            state.user.avatar = state.user.name.charAt(0).toUpperCase();
+            
+            updateUserUI();
+            D.loginModal.classList.add('hidden');
+            showToast(`Logged in with ${provider}!`, 'success');
+            saveState();
+        }
+        
+        function handleSocialRegister(provider) {
+            // Simulate social registration - in a real app, this would redirect to the OAuth provider
+            state.user.isLoggedIn = true;
+            state.user.name = `${provider} User`;
+            state.user.email = `user@${provider.toLowerCase()}.com`;
+            state.user.avatar = state.user.name.charAt(0).toUpperCase();
+            
+            updateUserUI();
+            D.registerModal.classList.add('hidden');
+            showToast(`Registered with ${provider}!`, 'success');
+            saveState();
+        }
+        
+        function handleLogout() {
+            state.user.isLoggedIn = false;
+            updateUserUI();
+            closeUserMenu();
+            showToast('Logged out successfully', 'success');
+            saveState();
+        }
+        
+        function updateUserUI() {
+            if (state.user.isLoggedIn) {
+                D.userAvatar.textContent = state.user.avatar;
+                D.profileAvatar.textContent = state.user.avatar;
+                D.profileName.textContent = state.user.name;
+                D.profileEmail.textContent = state.user.email;
+                D.profileNameInput.value = state.user.name;
+                D.profileEmailInput.value = state.user.email;
+            } else {
+                // Show login modal if not logged in
+                setTimeout(() => {
+                    if (!state.user.isLoggedIn) {
+                        D.loginModal.classList.remove('hidden');
+                    }
+                }, 1000);
+            }
+        }
+        
+        function toggleUserMenu() {
+            D.userMenu.classList.toggle('hidden');
+        }
+        
+        function closeUserMenu() {
+            D.userMenu.classList.add('hidden');
+        }
+        
+        function openProfileModal() {
+            D.profileModal.classList.remove('hidden');
+            closeUserMenu();
+        }
+        
+        function saveProfile() {
+            state.user.name = D.profileNameInput.value;
+            state.user.email = D.profileEmailInput.value;
+            state.user.bio = D.profileBioInput.value;
+            state.user.avatar = state.user.name.charAt(0).toUpperCase();
+            
+            updateUserUI();
+            D.profileModal.classList.add('hidden');
+            showToast('Profile updated successfully!', 'success');
+            saveState();
+        }
+        
+        function switchTab(tabId) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                }
             });
         }
         
@@ -970,7 +1909,7 @@
                     role: m.sender === 'user' ? 'user' : 'assistant',
                     content: m.text
                 }));
-
+                
                 // Check for features specific to Z-AI (Advanced model)
                 if (state.currentModel === 'zai') {
                     if (state.settings.webSearch && extractWebSearchQuery(messageText)) {
@@ -980,7 +1919,7 @@
                         messagesForApi[messagesForApi.length - 1].content += `\n\n[SYSTEM NOTE: User is asking to generate an image with the prompt: "${extractImagePrompt(messageText)}". Instead of generating an image, describe it in rich detail.]`;
                     }
                 }
-
+                
                 const response = await fetch(MODEL_CONFIGS[state.currentModel].endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1113,7 +2052,7 @@
             D.messagesContainer.classList.remove('hidden');
             
             D.messagesContainer.innerHTML = chat.messages.map((msg, index) => {
-                const config = MODEL_CONFIGS[msg.aiType || 'grok'];
+                const config = MODEL_CONFIGS[msg.aiType || 'groq'];
                 const senderIcon = msg.sender === 'user' ? 
                     `<div class="w-8 h-8 rounded-full bg-primary text-primary-foreground flex-shrink-0 flex items-center justify-center font-bold">U</div>` : 
                     `<div class="w-8 h-8 rounded-full bg-gradient-to-r ${config.color} flex-shrink-0 flex items-center justify-center text-white font-bold">${config.icon}</div>`;
@@ -1123,7 +2062,7 @@
                     processMessageText(msg.fullText || msg.text);
                 
                 const messageBubble = `
-                    <div class="message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'} ${msg.isError ? 'error-message' : ''}">
+                    <div class="message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'} ${msg.isError ? 'error-message' : ''} chatgpt-message">
                         <div class="message-content">${content}</div>
                         ${!msg.isTyping ? `
                             <div class="flex items-center justify-between mt-2">
@@ -1235,6 +2174,9 @@
             document.getElementById('webSearchToggle').checked = state.settings.webSearch;
             document.getElementById('imageGenToggle').checked = state.settings.imageGeneration;
             document.getElementById('voiceInputToggle').checked = state.settings.voiceInput;
+            document.getElementById('saveHistoryToggle').checked = state.settings.saveHistory;
+            document.getElementById('autoSaveToggle').checked = state.settings.autoSave;
+            document.getElementById('emailNotificationsToggle').checked = state.settings.emailNotifications;
             D.voiceBtn.style.display = state.settings.voiceInput ? 'flex' : 'none';
             setActiveButton(document.querySelector(`.fontSizeBtn[data-size="${state.settings.fontSize}"]`), '.fontSizeBtn');
             setActiveButton(document.querySelector(`.typingSpeedBtn[data-speed="${state.settings.typingSpeed}"]`), '.typingSpeedBtn');
@@ -1282,6 +2224,9 @@
             state.settings.webSearch = document.getElementById('webSearchToggle').checked;
             state.settings.imageGeneration = document.getElementById('imageGenToggle').checked;
             state.settings.voiceInput = document.getElementById('voiceInputToggle').checked;
+            state.settings.saveHistory = document.getElementById('saveHistoryToggle').checked;
+            state.settings.autoSave = document.getElementById('autoSaveToggle').checked;
+            state.settings.emailNotifications = document.getElementById('emailNotificationsToggle').checked;
             state.settings.fontSize = document.querySelector('.fontSizeBtn.active').dataset.size;
             state.settings.typingSpeed = document.querySelector('.typingSpeedBtn.active').dataset.speed;
             
@@ -1307,22 +2252,25 @@
             localStorage.setItem('aj_assistant_chats', JSON.stringify(state.chats)); 
             localStorage.setItem('aj_assistant_settings', JSON.stringify(state.settings)); 
             localStorage.setItem('aj_assistant_lastChatId', state.selectedChatId); 
+            localStorage.setItem('aj_assistant_user', JSON.stringify(state.user)); 
         }
         
         function loadState() { 
             const chats = localStorage.getItem('aj_assistant_chats'); 
             const settings = localStorage.getItem('aj_assistant_settings'); 
             const lastChatId = localStorage.getItem('aj_assistant_lastChatId'); 
+            const user = localStorage.getItem('aj_assistant_user');
+            
             if (chats) state.chats = JSON.parse(chats); 
             if (settings) state.settings = { ...defaultSettings, ...JSON.parse(settings) }; 
             if (lastChatId) state.selectedChatId = lastChatId; 
+            if (user) state.user = { ...state.user, ...JSON.parse(user) };
         }
         
         function setChatStatus(status) { 
             state.chatStatus = status; 
             D.messageInput.disabled = (status !== 'idle');
             D.messageInput.placeholder = (status !== 'idle') ? 'AI is responding...' : 'Message AJ...';
-
             if (status === 'streaming') { 
                 D.sendBtn.innerHTML = `<i data-lucide="square" class="h-4 w-4"></i>`; 
                 D.sendBtn.onclick = () => state.abortController?.abort(); 
