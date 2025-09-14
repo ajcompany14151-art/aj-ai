@@ -8,6 +8,7 @@
     <link rel="icon" href="https://z-cdn-media.chatglm.cn/files/c32d0305-6191-4efa-8fa0-2fc21769cdc5_favicon.png?auth_key=1789388559-c7c532dc96654b6397d49d68beb4e472-0-f12d933b7764476ba4a5572169f5ec4d" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -831,6 +832,34 @@
         .tab-content.active {
             display: block;
         }
+        
+        /* Loading animation for splash screen */
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #10a37f;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+        
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes loading {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
     </style>
 </head>
 <body class="font-sans">
@@ -845,7 +874,6 @@
             <div class="loading-dot"></div>
         </div>
     </div>
-
     <!-- Login Modal -->
     <div id="loginModal" class="auth-modal hidden">
         <div class="auth-container">
@@ -882,7 +910,6 @@
             </div>
         </div>
     </div>
-
     <!-- Registration Modal -->
     <div id="registerModal" class="auth-modal hidden">
         <div class="auth-container">
@@ -921,7 +948,6 @@
             </div>
         </div>
     </div>
-
     <div id="app">
         <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
         <div id="sidebar" class="sidebar chatgpt-sidebar">
@@ -1351,7 +1377,7 @@
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span class="text-muted-foreground">Member Since</span>
-                            <span>January 2023</span>
+                            <span id="memberSince">January 2023</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-muted-foreground">Account Type</span>
@@ -1359,7 +1385,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-muted-foreground">API Calls Used</span>
-                            <span>1,247 / 10,000</span>
+                            <span id="apiCallsUsed">1,247 / 10,000</span>
                         </div>
                     </div>
                 </div>
@@ -1374,6 +1400,11 @@
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50"></div>
     
     <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://vpjtmusxlwhpuiqvwpor.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwanRtdXN4bHdocHVpcXZ3cG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc4NTUyNTIsImV4cCI6MjA3MzQzMTI1Mn0.7NgNY3zjG0s3-_q0c_rMMLcCkr5ngaA9UmT_2qu_S1A';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
         // --- FINALIZED SCRIPT WITH THREE AI MODELS & ADVANCED FEATURES ---
         const defaultSettings = { 
             darkMode: false, 
@@ -1389,6 +1420,7 @@
         };
         let state = { 
             user: {
+                id: null,
                 isLoggedIn: false,
                 name: "User Name",
                 email: "user@example.com",
@@ -1464,7 +1496,7 @@
             profileBioInput: document.getElementById('profileBioInput')
         };
         
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             // Hide splash screen after 3 seconds with flashing and glowing effect
             setTimeout(() => {
                 D.splashScreen.style.opacity = '0';
@@ -1474,6 +1506,30 @@
             }, 3000);
             
             lucide.createIcons();
+            
+            // Check if user is already logged in
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                state.user.isLoggedIn = true;
+                state.user.id = user.id;
+                state.user.email = user.email;
+                state.user.name = user.user_metadata?.full_name || user.email?.split('@')[0] || "User";
+                state.user.avatar = state.user.name.charAt(0).toUpperCase();
+                
+                // Load user profile
+                await loadUserProfile();
+                
+                // Load user's chats
+                await loadUserChats();
+            } else {
+                // Show login modal after splash screen
+                setTimeout(() => {
+                    if (!state.user.isLoggedIn) {
+                        D.loginModal.classList.remove('hidden');
+                    }
+                }, 3500);
+            }
+            
             loadState();
             applySettings();
             initializeEventListeners();
@@ -1481,6 +1537,165 @@
             selectChat(state.selectedChatId || state.chats[0]?.id || createNewChat(false));
             updateUserUI();
         });
+        
+        // Load user profile from Supabase
+        async function loadUserProfile() {
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', state.user.id)
+                    .single();
+                
+                if (error) {
+                    console.error('Error loading profile:', error);
+                    // Create a new profile if it doesn't exist
+                    await createUserProfile();
+                    return;
+                }
+                
+                if (data) {
+                    state.user.name = data.full_name || state.user.name;
+                    state.user.avatar = data.avatar_url || state.user.name.charAt(0).toUpperCase();
+                    state.user.isPremium = data.is_premium || false;
+                    state.user.apiCallsUsed = data.api_calls_used || 0;
+                    state.user.apiCallsLimit = data.api_calls_limit || 10000;
+                    state.user.memberSince = new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+            } catch (error) {
+                console.error('Error in loadUserProfile:', error);
+            }
+        }
+        
+        // Create a new user profile in Supabase
+        async function createUserProfile() {
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: state.user.id,
+                            full_name: state.user.name,
+                            email: state.user.email,
+                            avatar_url: state.user.avatar,
+                            is_premium: false,
+                            api_calls_used: 0,
+                            api_calls_limit: 10000
+                        }
+                    ])
+                    .select();
+                
+                if (error) {
+                    console.error('Error creating profile:', error);
+                    return;
+                }
+                
+                if (data) {
+                    console.log('Profile created successfully');
+                }
+            } catch (error) {
+                console.error('Error in createUserProfile:', error);
+            }
+        }
+        
+        // Update user profile in Supabase
+        async function updateUserProfile() {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({
+                        full_name: state.user.name,
+                        email: state.user.email,
+                        avatar_url: state.user.avatar,
+                        api_calls_used: state.user.apiCallsUsed
+                    })
+                    .eq('id', state.user.id);
+                
+                if (error) {
+                    console.error('Error updating profile:', error);
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error in updateUserProfile:', error);
+                return false;
+            }
+        }
+        
+        // Load user's chats from Supabase
+        async function loadUserChats() {
+            try {
+                const { data, error } = await supabase
+                    .from('chats')
+                    .select('*')
+                    .eq('user_id', state.user.id)
+                    .order('updated_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading chats:', error);
+                    return;
+                }
+                
+                if (data) {
+                    state.chats = data.map(chat => ({
+                        ...chat,
+                        messages: chat.messages || []
+                    }));
+                    
+                    if (state.chats.length === 0) {
+                        createNewChat(true);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in loadUserChats:', error);
+            }
+        }
+        
+        // Save chat to Supabase
+        async function saveChatToSupabase(chatId) {
+            if (!state.user.isLoggedIn) return;
+            
+            try {
+                const chat = state.chats.find(c => c.id === chatId);
+                if (!chat) return;
+                
+                const { error } = await supabase
+                    .from('chats')
+                    .upsert({
+                        id: chatId,
+                        user_id: state.user.id,
+                        title: chat.title,
+                        model: chat.model,
+                        messages: chat.messages,
+                        updated_at: new Date().toISOString()
+                    });
+                
+                if (error) {
+                    console.error('Error saving chat:', error);
+                }
+            } catch (error) {
+                console.error('Error in saveChatToSupabase:', error);
+            }
+        }
+        
+        // Delete chat from Supabase
+        async function deleteChatFromSupabase(chatId) {
+            if (!state.user.isLoggedIn) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('chats')
+                    .delete()
+                    .eq('id', chatId);
+                
+                if (error) {
+                    console.error('Error deleting chat:', error);
+                }
+            } catch (error) {
+                console.error('Error in deleteChatFromSupabase:', error);
+            }
+        }
         
         function initializeEventListeners() {
             document.getElementById('mobileMenuBtn').addEventListener('click', toggleSidebar);
@@ -1601,24 +1816,47 @@
         }
         
         // Authentication functions
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const email = e.target.querySelector('input[type="email"]').value;
             const password = e.target.querySelector('input[type="password"]').value;
             
-            // Simulate login - in a real app, this would be an API call
-            state.user.isLoggedIn = true;
-            state.user.email = email;
-            state.user.name = email.split('@')[0];
-            state.user.avatar = state.user.name.charAt(0).toUpperCase();
-            
-            updateUserUI();
-            D.loginModal.classList.add('hidden');
-            showToast('Login successful!', 'success');
-            saveState();
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) {
+                    showToast(error.message, 'error');
+                    return;
+                }
+                
+                if (data.user) {
+                    state.user.isLoggedIn = true;
+                    state.user.id = data.user.id;
+                    state.user.email = data.user.email;
+                    state.user.name = data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || "User";
+                    state.user.avatar = state.user.name.charAt(0).toUpperCase();
+                    
+                    // Load user profile
+                    await loadUserProfile();
+                    
+                    // Load user's chats
+                    await loadUserChats();
+                    
+                    updateUserUI();
+                    D.loginModal.classList.add('hidden');
+                    showToast('Login successful!', 'success');
+                    saveState();
+                }
+            } catch (error) {
+                console.error('Error in handleLogin:', error);
+                showToast('An error occurred during login', 'error');
+            }
         }
         
-        function handleRegister(e) {
+        async function handleRegister(e) {
             e.preventDefault();
             const name = e.target.querySelector('input[type="text"]').value;
             const email = e.target.querySelector('input[type="email"]').value;
@@ -1630,50 +1868,105 @@
                 return;
             }
             
-            // Simulate registration - in a real app, this would be an API call
-            state.user.isLoggedIn = true;
-            state.user.name = name;
-            state.user.email = email;
-            state.user.avatar = name.charAt(0).toUpperCase();
-            
-            updateUserUI();
-            D.registerModal.classList.add('hidden');
-            showToast('Registration successful!', 'success');
-            saveState();
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name
+                        }
+                    }
+                });
+                
+                if (error) {
+                    showToast(error.message, 'error');
+                    return;
+                }
+                
+                if (data.user) {
+                    state.user.isLoggedIn = true;
+                    state.user.id = data.user.id;
+                    state.user.email = data.user.email;
+                    state.user.name = name;
+                    state.user.avatar = name.charAt(0).toUpperCase();
+                    
+                    // Create user profile
+                    await createUserProfile();
+                    
+                    // Create a new chat for the user
+                    createNewChat(true);
+                    
+                    updateUserUI();
+                    D.registerModal.classList.add('hidden');
+                    showToast('Registration successful!', 'success');
+                    saveState();
+                }
+            } catch (error) {
+                console.error('Error in handleRegister:', error);
+                showToast('An error occurred during registration', 'error');
+            }
         }
         
-        function handleSocialLogin(provider) {
-            // Simulate social login - in a real app, this would redirect to the OAuth provider
-            state.user.isLoggedIn = true;
-            state.user.name = `${provider} User`;
-            state.user.email = `user@${provider.toLowerCase()}.com`;
-            state.user.avatar = state.user.name.charAt(0).toUpperCase();
-            
-            updateUserUI();
-            D.loginModal.classList.add('hidden');
-            showToast(`Logged in with ${provider}!`, 'success');
-            saveState();
+        async function handleSocialLogin(provider) {
+            try {
+                let authProvider;
+                switch (provider) {
+                    case 'Google':
+                        authProvider = 'google';
+                        break;
+                    case 'GitHub':
+                        authProvider = 'github';
+                        break;
+                    case 'Microsoft':
+                        authProvider = 'azure';
+                        break;
+                    default:
+                        authProvider = 'google';
+                }
+                
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: authProvider,
+                });
+                
+                if (error) {
+                    showToast(error.message, 'error');
+                    return;
+                }
+                
+                // The OAuth flow will redirect the user, so we don't need to do anything else here
+            } catch (error) {
+                console.error('Error in handleSocialLogin:', error);
+                showToast(`An error occurred during ${provider} login`, 'error');
+            }
         }
         
-        function handleSocialRegister(provider) {
-            // Simulate social registration - in a real app, this would redirect to the OAuth provider
-            state.user.isLoggedIn = true;
-            state.user.name = `${provider} User`;
-            state.user.email = `user@${provider.toLowerCase()}.com`;
-            state.user.avatar = state.user.name.charAt(0).toUpperCase();
-            
-            updateUserUI();
-            D.registerModal.classList.add('hidden');
-            showToast(`Registered with ${provider}!`, 'success');
-            saveState();
+        async function handleSocialRegister(provider) {
+            // For OAuth, login and registration are the same process
+            handleSocialLogin(provider);
         }
         
-        function handleLogout() {
-            state.user.isLoggedIn = false;
-            updateUserUI();
-            closeUserMenu();
-            showToast('Logged out successfully', 'success');
-            saveState();
+        async function handleLogout() {
+            try {
+                await supabase.auth.signOut();
+                
+                state.user.isLoggedIn = false;
+                state.user.id = null;
+                state.chats = [];
+                state.selectedChatId = null;
+                
+                updateUserUI();
+                closeUserMenu();
+                showToast('Logged out successfully', 'success');
+                
+                // Show login modal
+                D.loginModal.classList.remove('hidden');
+                
+                saveState();
+            } catch (error) {
+                console.error('Error in handleLogout:', error);
+                showToast('An error occurred during logout', 'error');
+            }
         }
         
         function updateUserUI() {
@@ -1684,13 +1977,8 @@
                 D.profileEmail.textContent = state.user.email;
                 D.profileNameInput.value = state.user.name;
                 D.profileEmailInput.value = state.user.email;
-            } else {
-                // Show login modal if not logged in
-                setTimeout(() => {
-                    if (!state.user.isLoggedIn) {
-                        D.loginModal.classList.remove('hidden');
-                    }
-                }, 1000);
+                document.getElementById('memberSince').textContent = state.user.memberSince;
+                document.getElementById('apiCallsUsed').textContent = `${state.user.apiCallsUsed} / ${state.user.apiCallsLimit}`;
             }
         }
         
@@ -1707,16 +1995,23 @@
             closeUserMenu();
         }
         
-        function saveProfile() {
+        async function saveProfile() {
             state.user.name = D.profileNameInput.value;
             state.user.email = D.profileEmailInput.value;
             state.user.bio = D.profileBioInput.value;
             state.user.avatar = state.user.name.charAt(0).toUpperCase();
             
-            updateUserUI();
-            D.profileModal.classList.add('hidden');
-            showToast('Profile updated successfully!', 'success');
-            saveState();
+            // Update profile in Supabase
+            const success = await updateUserProfile();
+            
+            if (success) {
+                updateUserUI();
+                D.profileModal.classList.add('hidden');
+                showToast('Profile updated successfully!', 'success');
+                saveState();
+            } else {
+                showToast('Failed to update profile', 'error');
+            }
         }
         
         function switchTab(tabId) {
@@ -1899,6 +2194,12 @@
             D.messageInput.style.height = 'auto';
             renderChatList();
             renderMessages();
+            
+            // Save chat to Supabase if user is logged in
+            if (state.user.isLoggedIn) {
+                saveChatToSupabase(state.selectedChatId);
+            }
+            
             saveState();
             
             state.abortController = new AbortController();
@@ -1963,6 +2264,12 @@
                 if (!aiMessage.isTyping) {
                     setChatStatus('idle');
                 }
+                
+                // Save chat to Supabase if user is logged in
+                if (state.user.isLoggedIn) {
+                    saveChatToSupabase(state.selectedChatId);
+                }
+                
                 saveState();
             }
         }
@@ -2026,6 +2333,12 @@
                     message.isTyping = false;
                     renderMessages();
                     setChatStatus('idle');
+                    
+                    // Save chat to Supabase if user is logged in
+                    if (state.user.isLoggedIn) {
+                        saveChatToSupabase(state.selectedChatId);
+                    }
+                    
                     saveState();
                 }
             }, typingSpeed);
@@ -2108,6 +2421,12 @@
                 messages: [] 
             }; 
             state.chats.unshift(chat); 
+            
+            // Save chat to Supabase if user is logged in
+            if (state.user.isLoggedIn) {
+                saveChatToSupabase(chat.id);
+            }
+            
             if (select) selectChat(chat.id); 
             return chat.id; 
         }
@@ -2136,10 +2455,16 @@
             } 
         }
         
-        function deleteChat(e, id) { 
+        async function deleteChat(e, id) { 
             e.stopPropagation(); 
             if (!confirm('Delete this conversation?')) return; 
             state.chats = state.chats.filter(c => c.id !== id); 
+            
+            // Delete chat from Supabase if user is logged in
+            if (state.user.isLoggedIn) {
+                deleteChatFromSupabase(id);
+            }
+            
             if (state.selectedChatId === id) { 
                 selectChat(state.chats[0]?.id); 
             } 
@@ -2154,6 +2479,12 @@
             if (chat) { 
                 chat.messages = []; 
                 renderMessages(); 
+                
+                // Save chat to Supabase if user is logged in
+                if (state.user.isLoggedIn) {
+                    saveChatToSupabase(state.selectedChatId);
+                }
+                
                 saveState(); 
                 showToast('Conversation cleared', 'success'); 
             } 
@@ -2214,6 +2545,11 @@
             if (chat) {
                 chat.model = model;
                 renderChatList();
+                
+                // Save chat to Supabase if user is logged in
+                if (state.user.isLoggedIn) {
+                    saveChatToSupabase(state.selectedChatId);
+                }
             }
             if(showNotif) showToast(`Switched to ${MODEL_CONFIGS[model].name}`, 'info');
         }
@@ -2249,22 +2585,16 @@
         }
         
         function saveState() { 
-            localStorage.setItem('aj_assistant_chats', JSON.stringify(state.chats)); 
             localStorage.setItem('aj_assistant_settings', JSON.stringify(state.settings)); 
             localStorage.setItem('aj_assistant_lastChatId', state.selectedChatId); 
-            localStorage.setItem('aj_assistant_user', JSON.stringify(state.user)); 
         }
         
         function loadState() { 
-            const chats = localStorage.getItem('aj_assistant_chats'); 
             const settings = localStorage.getItem('aj_assistant_settings'); 
             const lastChatId = localStorage.getItem('aj_assistant_lastChatId'); 
-            const user = localStorage.getItem('aj_assistant_user');
             
-            if (chats) state.chats = JSON.parse(chats); 
             if (settings) state.settings = { ...defaultSettings, ...JSON.parse(settings) }; 
             if (lastChatId) state.selectedChatId = lastChatId; 
-            if (user) state.user = { ...state.user, ...JSON.parse(user) };
         }
         
         function setChatStatus(status) { 
