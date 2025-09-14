@@ -1,8 +1,15 @@
 [build]
-  publish = "./"                 # This is where your index.html is
-  functions = "netlify/functions"  # Your serverless functions location
+  publish = "."
+
+[functions]
+  "chat" = { runtime = "nodejs18.x" }
 
 [[redirects]]
-  from = "/api/chat"
-  to = "/.netlify/functions/chat"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
