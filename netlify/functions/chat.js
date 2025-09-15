@@ -1,11 +1,12 @@
-export async function handler(event, context) {
+// netlify/functions/chat.js
+exports.handler = async (event, context) => {
   // Set CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
-
+  
   // Handle preflight OPTIONS request
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -14,7 +15,7 @@ export async function handler(event, context) {
       body: ""
     };
   }
-
+  
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -22,7 +23,7 @@ export async function handler(event, context) {
       body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
-
+  
   try {
     const { messages, ai } = JSON.parse(event.body);
     
@@ -34,14 +35,14 @@ export async function handler(event, context) {
         body: JSON.stringify({ error: "Invalid or empty messages array" }),
       };
     }
-
+    
     // Check for required environment variables
     const requiredEnvVars = {
       'groq': 'GROQ_API_KEY',
       'gemini': 'GEMINI_API_KEY',
       'zai': 'OPENAI_API_KEY'
     };
-
+    
     const envVar = requiredEnvVars[ai];
     if (!envVar || !process.env[envVar]) {
       return {
@@ -50,14 +51,14 @@ export async function handler(event, context) {
         body: JSON.stringify({ error: `API key not configured for ${ai}` }),
       };
     }
-
+    
     let responseText = "";
     let apiUrl = "";
     let requestBody = {};
     let requestHeaders = {
       'Content-Type': 'application/json'
     };
-
+    
     // === GEMINI ===
     if (ai === "gemini") {
       const apiKey = process.env.GEMINI_API_KEY;
@@ -109,7 +110,7 @@ export async function handler(event, context) {
         body: JSON.stringify({ error: "Invalid AI provider" }),
       };
     }
-
+    
     console.log(`Sending request to ${ai} API...`);
     
     const response = await fetch(apiUrl, {
@@ -117,7 +118,7 @@ export async function handler(event, context) {
       headers: requestHeaders,
       body: JSON.stringify(requestBody),
     });
-
+    
     if (!response.ok) {
       const errorData = await response.text();
       console.error(`API Error (${response.status}):`, errorData);
@@ -130,7 +131,7 @@ export async function handler(event, context) {
         }),
       };
     }
-
+    
     const data = await response.json();
     
     // Extract response text based on AI provider
@@ -141,7 +142,7 @@ export async function handler(event, context) {
     } else if (ai === "zai") {
       responseText = data.choices?.[0]?.message?.content || "No response from Z-AI.";
     }
-
+    
     if (!responseText) {
       return {
         statusCode: 500,
@@ -149,7 +150,7 @@ export async function handler(event, context) {
         body: JSON.stringify({ error: "Empty response from AI provider" }),
       };
     }
-
+    
     return {
       statusCode: 200,
       headers,
@@ -166,4 +167,4 @@ export async function handler(event, context) {
       }),
     };
   }
-}
+};
